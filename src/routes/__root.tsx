@@ -1,5 +1,6 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { CartProvider } from "@/contexts/CartContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
@@ -15,9 +16,7 @@ function NotFoundComponent() {
           La página que buscas no existe o ha sido movida.
         </p>
         <div className="mt-6">
-          <Link to="/" className="btn-primary">
-            Ir al inicio
-          </Link>
+          <Link to="/" className="btn-primary">Ir al inicio</Link>
         </div>
       </div>
     </div>
@@ -31,6 +30,8 @@ export const Route = createRootRoute({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Florería Girasoles" },
       { name: "description", content: "Arreglos florales artesanales para cada momento especial" },
+      { name: "X-Content-Type-Options", content: "nosniff" },
+      { name: "Referrer-Policy", content: "strict-origin-when-cross-origin" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -57,13 +58,15 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <CartProvider>
-      <Navbar />
-      <CartDrawer />
-      <main className="min-h-screen">
-        <Outlet />
-      </main>
-      <Footer />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <Navbar />
+        <CartDrawer />
+        <main className="min-h-screen">
+          <Outlet />
+        </main>
+        <Footer />
+      </CartProvider>
+    </AuthProvider>
   );
 }
