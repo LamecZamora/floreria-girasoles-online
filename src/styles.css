@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,47 +43,46 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-gold: var(--gold);
-  --color-gold-foreground: var(--gold-foreground);
-  --color-rose: var(--rose-brand);
-  --color-rose-foreground: var(--rose-foreground);
-  --color-cream: var(--cream);
-  --color-forest: var(--forest);
-  --font-heading: 'Cormorant Garamond', serif;
-  --font-body: 'DM Sans', sans-serif;
+  --color-sunflower: var(--sunflower);
+  --color-rose-brand: var(--rose-brand);
+  --color-rose-light: var(--rose-light);
+  --color-sage: var(--sage);
+  --color-sage-light: var(--sage-light);
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
 }
 
 :root {
   --radius: 0.75rem;
-  /* Cream & warm palette */
-  --background: oklch(0.975 0.005 85);
-  --foreground: oklch(0.22 0.02 50);
-  --card: oklch(0.995 0.002 85);
-  --card-foreground: oklch(0.22 0.02 50);
-  --popover: oklch(0.995 0.002 85);
-  --popover-foreground: oklch(0.22 0.02 50);
-  /* Deep forest green */
-  --primary: oklch(0.38 0.08 160);
-  --primary-foreground: oklch(0.98 0.005 85);
-  /* Warm cream secondary */
-  --secondary: oklch(0.94 0.015 85);
-  --secondary-foreground: oklch(0.30 0.03 50);
+  /* Original warm palette */
+  --background: oklch(0.98 0.008 85);
+  --foreground: oklch(0.25 0.02 40);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.25 0.02 40);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.25 0.02 40);
+  /* Sunflower yellow primary */
+  --primary: oklch(0.78 0.16 80);
+  --primary-foreground: oklch(0.98 0.01 85);
+  /* Sage green secondary */
+  --secondary: oklch(0.55 0.08 155);
+  --secondary-foreground: oklch(0.98 0.01 155);
   --muted: oklch(0.95 0.01 85);
-  --muted-foreground: oklch(0.50 0.02 50);
-  --accent: oklch(0.93 0.02 85);
-  --accent-foreground: oklch(0.30 0.03 50);
+  --muted-foreground: oklch(0.50 0.02 40);
+  /* Rose accent */
+  --accent: oklch(0.62 0.18 15);
+  --accent-foreground: oklch(0.98 0.01 15);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.98 0.003 85);
   --border: oklch(0.90 0.015 85);
   --input: oklch(0.90 0.015 85);
-  --ring: oklch(0.38 0.08 160);
-  /* Brand colors */
-  --gold: oklch(0.78 0.14 80);
-  --gold-foreground: oklch(0.25 0.04 50);
-  --rose-brand: oklch(0.65 0.18 10);
-  --rose-foreground: oklch(0.98 0.005 10);
-  --cream: oklch(0.97 0.01 85);
-  --forest: oklch(0.38 0.08 160);
+  --ring: oklch(0.78 0.16 80);
+  /* Brand extras */
+  --sunflower: oklch(0.82 0.18 85);
+  --rose-brand: oklch(0.62 0.18 15);
+  --rose-light: oklch(0.94 0.03 15);
+  --sage: oklch(0.55 0.08 155);
+  --sage-light: oklch(0.94 0.03 155);
   /* Charts */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -92,13 +91,17 @@
   --chart-5: oklch(0.769 0.188 70.08);
   /* Sidebar */
   --sidebar: oklch(0.98 0.005 85);
-  --sidebar-foreground: oklch(0.22 0.02 50);
-  --sidebar-primary: oklch(0.38 0.08 160);
-  --sidebar-primary-foreground: oklch(0.98 0.005 85);
-  --sidebar-accent: oklch(0.94 0.015 85);
-  --sidebar-accent-foreground: oklch(0.30 0.03 50);
+  --sidebar-foreground: oklch(0.25 0.02 40);
+  --sidebar-primary: oklch(0.78 0.16 80);
+  --sidebar-primary-foreground: oklch(0.98 0.01 85);
+  --sidebar-accent: oklch(0.95 0.01 85);
+  --sidebar-accent-foreground: oklch(0.25 0.02 40);
   --sidebar-border: oklch(0.90 0.015 85);
-  --sidebar-ring: oklch(0.38 0.08 160);
+  --sidebar-ring: oklch(0.78 0.16 80);
+
+  --shadow-soft: 0 2px 15px -3px oklch(0.78 0.16 80 / 0.15);
+  --shadow-card: 0 4px 24px -6px oklch(0.78 0.16 80 / 0.12), 0 1px 3px oklch(0.78 0.16 80 / 0.06);
+  --shadow-hover: 0 12px 40px -8px oklch(0.78 0.16 80 / 0.22), 0 4px 12px oklch(0.78 0.16 80 / 0.08);
 }
 
 @layer base {
@@ -145,41 +148,57 @@
     font-family: var(--font-body);
     font-weight: 500;
     font-size: 0.875rem;
-    padding: 0.75rem 1.75rem;
+    padding: 0.75rem 1.5rem;
     border-radius: var(--radius);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    box-shadow: 0 2px 8px -2px oklch(0.78 0.16 80 / 0.3);
   }
   .btn-primary:hover {
     opacity: 0.92;
     transform: translateY(-1px);
-    box-shadow: 0 8px 25px -8px oklch(0.38 0.08 160 / 0.35);
+    box-shadow: 0 8px 25px -8px oklch(0.78 0.16 80 / 0.4);
   }
   .btn-primary:active {
     transform: scale(0.97);
   }
 
-  .btn-gold {
+  .btn-accent {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    background-color: var(--color-gold);
-    color: var(--color-gold-foreground);
+    background-color: var(--color-accent);
+    color: var(--color-accent-foreground);
     font-family: var(--font-body);
-    font-weight: 600;
+    font-weight: 500;
     font-size: 0.875rem;
-    padding: 0.75rem 1.75rem;
+    padding: 0.75rem 1.5rem;
     border-radius: var(--radius);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px -2px oklch(0.62 0.18 15 / 0.3);
   }
-  .btn-gold:hover {
-    opacity: 0.9;
+  .btn-accent:hover {
+    opacity: 0.92;
     transform: translateY(-1px);
-    box-shadow: 0 8px 25px -8px oklch(0.78 0.14 80 / 0.4);
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius);
+    transition: all 0.3s;
+  }
+  .btn-outline:hover {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
   }
 
   .btn-outline-light {
@@ -192,11 +211,9 @@
     font-family: var(--font-body);
     font-weight: 500;
     font-size: 0.875rem;
-    padding: 0.75rem 1.75rem;
+    padding: 0.75rem 1.5rem;
     border-radius: var(--radius);
     transition: all 0.3s;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
     backdrop-filter: blur(8px);
   }
   .btn-outline-light:hover {
@@ -205,7 +222,7 @@
 
   .section-heading {
     font-family: var(--font-heading);
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-foreground);
     line-height: 1.15;
   }
@@ -215,11 +232,11 @@
     border-radius: 1rem;
     overflow: hidden;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 12px -4px oklch(0.22 0.02 50 / 0.08);
+    box-shadow: var(--shadow-card);
   }
   .card-product:hover {
-    box-shadow: 0 16px 48px -12px oklch(0.22 0.02 50 / 0.15);
-    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-6px);
   }
   @media (hover: none) {
     .card-product:hover {
@@ -228,11 +245,11 @@
   }
 
   .glass-card {
-    background-color: oklch(0.995 0.002 85 / 0.85);
+    background-color: oklch(1 0 0 / 0.85);
     backdrop-filter: blur(16px);
     border: 1px solid oklch(0.90 0.015 85 / 0.6);
     border-radius: 1rem;
-    box-shadow: 0 4px 24px -8px oklch(0.22 0.02 50 / 0.08);
+    box-shadow: var(--shadow-card);
   }
 
   .badge-category {
@@ -243,6 +260,18 @@
     font-size: 0.75rem;
     font-weight: 500;
     backdrop-filter: blur(8px);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, oklch(0.78 0.16 80), oklch(0.62 0.18 15));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .dots-pattern {
+    background-image: radial-gradient(oklch(0.78 0.16 80 / 0.08) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 
   .scrollbar-hide {
