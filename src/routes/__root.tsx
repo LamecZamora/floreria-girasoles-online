@@ -67,6 +67,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <Footer />
+        <WhatsAppButton />
       </CartProvider>
     </AuthProvider>
   );
