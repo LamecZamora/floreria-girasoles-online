@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Florería Girasoles - Arreglos Florales Artesanales" },
-      { name: "description", content: "Creamos arreglos florales únicos para cada momento especial. Bodas, XV años, cumpleaños y más en CDMX." },
+      { name: "description", content: "Creamos arreglos florales únicos para cada momento especial. Bodas, XV años, cumpleaños y más en Durango, México." },
       { property: "og:title", content: "Florería Girasoles - Arreglos Florales Artesanales" },
       { property: "og:description", content: "Creamos arreglos florales únicos para cada momento especial." },
     ],
@@ -38,7 +38,7 @@ function Index() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-10 relative z-10">
         <div className="grid grid-cols-3 gap-3 sm:gap-5 max-w-3xl mx-auto">
           {[
-            { icon: Truck, title: "Entrega Puntual", desc: "En toda CDMX" },
+            { icon: Truck, title: "Entrega Puntual", desc: "En todo Durango" },
             { icon: Shield, title: "Pago Seguro", desc: "100% protegido" },
             { icon: Heart, title: "Hecho a Mano", desc: "Con amor y dedicación" },
           ].map(({ icon: Icon, title, desc }, i) => (
