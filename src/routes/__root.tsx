@@ -4,6 +4,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -66,6 +67,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <Footer />
+        <WhatsAppButton />
       </CartProvider>
     </AuthProvider>
   );
