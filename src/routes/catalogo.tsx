@@ -4,7 +4,6 @@ import { mockProducts, type Category } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import { Search, X } from "lucide-react";
-import { motion } from "framer-motion";
 
 export const Route = createFileRoute("/catalogo")({
   component: CatalogoPage,
@@ -37,17 +36,12 @@ function CatalogoPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14">
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-10 sm:mb-14"
-      >
+      <div className="text-center mb-10 sm:mb-14">
         <h1 className="section-heading text-3xl sm:text-4xl md:text-5xl mb-3">Catálogo Completo</h1>
         <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
           Explora nuestra colección de {mockProducts.length} arreglos florales artesanales.
         </p>
-      </motion.div>
+      </div>
 
       {/* Search & Sort */}
       <div className="max-w-2xl mx-auto mb-8 flex gap-2">
