@@ -38,6 +38,14 @@ function AuthPage() {
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
+  const switchMode = useCallback(() => {
+    setIsLogin(v => !v);
+    setError("");
+    setSuccess("");
+    setPasswordErrors([]);
+    setCaptchaVerified(false);
+  }, []);
+
   if (user) {
     navigate({ to: "/" });
     return null;
