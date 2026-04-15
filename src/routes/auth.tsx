@@ -103,13 +103,6 @@ function AuthPage() {
     }
   };
 
-  const switchMode = useCallback(() => {
-    setIsLogin(v => !v);
-    setError("");
-    setSuccess("");
-    setPasswordErrors([]);
-    setCaptchaVerified(false);
-  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
