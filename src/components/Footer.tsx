@@ -46,11 +46,11 @@ const Footer = () => (
           <ul className="space-y-3 text-sm text-primary-foreground/60">
             <li className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-              Ciudad de México
+              Durango, México
             </li>
             <li className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-primary flex-shrink-0" />
-              (55) 1234-5678
+              +52 618 116 9706
             </li>
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-primary flex-shrink-0" />
