@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      orders: {
+        Row: {
+          created_at: string
+          delivery_address: string | null
+          id: string
+          items: Json
+          notes: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_address?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_address?: string | null
+          id?: string
+          items?: Json
+          notes?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -77,6 +113,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      order_status:
+        | "pendiente"
+        | "confirmado"
+        | "enviado"
+        | "entregado"
+        | "cancelado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -205,6 +247,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      order_status: [
+        "pendiente",
+        "confirmado",
+        "enviado",
+        "entregado",
+        "cancelado",
+      ],
     },
   },
 } as const

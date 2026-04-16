@@ -35,6 +35,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
@@ -44,6 +45,7 @@ function AuthPage() {
     setSuccess("");
     setPasswordErrors([]);
     setCaptchaVerified(false);
+    setCaptchaKey(k => k + 1);
   }, []);
 
   if (user) {
@@ -205,7 +207,7 @@ function AuthPage() {
               )}
             </div>
 
-            <CaptchaChallenge onVerified={setCaptchaVerified} />
+            <CaptchaChallenge key={captchaKey} onVerified={setCaptchaVerified} />
 
             {error && (
               <div className="bg-destructive/10 text-destructive rounded-lg px-3 py-2 text-sm flex items-center gap-2">

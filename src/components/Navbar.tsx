@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { ShoppingCart, Menu, X, User, LogOut, Settings } from "lucide-react";
+import { ShoppingCart, Menu, X, User, LogOut, Settings, ClipboardList } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
@@ -55,6 +55,9 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-1">
           <NavItem to="/" label="Inicio" active={location.pathname === "/"} />
           <NavItem to="/catalogo" label="Catálogo" active={location.pathname === "/catalogo"} />
+          {user && (
+            <NavItem to="/pedidos" label="Pedidos" active={location.pathname === "/pedidos"} icon={<ClipboardList className="h-3.5 w-3.5" />} />
+          )}
           {isAdmin && (
             <NavItem to="/admin" label="Admin" active={location.pathname === "/admin"} icon={<Settings className="h-3.5 w-3.5" />} />
           )}
@@ -119,6 +122,9 @@ const Navbar = () => {
               <div className="flex-1 px-6 py-6 flex flex-col gap-1">
                 <MobileLink to="/" onClick={() => setMobileOpen(false)} icon="🏠" active={location.pathname === "/"}>Inicio</MobileLink>
                 <MobileLink to="/catalogo" onClick={() => setMobileOpen(false)} icon="🌻" active={location.pathname === "/catalogo"}>Catálogo</MobileLink>
+                {user && (
+                  <MobileLink to="/pedidos" onClick={() => setMobileOpen(false)} icon="📋" active={location.pathname === "/pedidos"}>Mis Pedidos</MobileLink>
+                )}
                 {isAdmin && (
                   <MobileLink to="/admin" onClick={() => setMobileOpen(false)} icon="⚙️" active={location.pathname === "/admin"}>Panel Admin</MobileLink>
                 )}
