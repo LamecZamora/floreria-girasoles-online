@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Eye, EyeOff, Mail, Lock, User, Shield, AlertTriangle, Flower2 } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, AlertTriangle, Flower2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import CaptchaChallenge from "@/components/CaptchaChallenge";
@@ -103,23 +103,21 @@ function AuthPage() {
     }
   };
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Decorative background */}
-      <div className="absolute inset-0 dots-pattern opacity-40" />
-      <div className="absolute top-20 -right-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 -left-20 w-72 h-72 bg-accent/5 rounded-full blur-3xl" />
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="absolute inset-0 dots-pattern opacity-20" />
+      <div className="absolute top-10 right-10 w-96 h-96 bg-primary/8 rounded-full blur-[100px]" />
+      <div className="absolute bottom-10 left-10 w-80 h-80 bg-accent/8 rounded-full blur-[100px]" />
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
         className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+          <Link to="/" className="inline-flex items-center gap-2.5 group">
+            <div className="h-11 w-11 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
               <Flower2 className="h-5 w-5 text-primary" />
             </div>
             <span className="font-heading text-2xl sm:text-3xl font-bold text-foreground">
@@ -131,16 +129,7 @@ function AuthPage() {
           </p>
         </div>
 
-        <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-6 sm:p-8 relative overflow-hidden">
-          {/* Decorative corner */}
-          <div className="absolute -top-12 -right-12 w-24 h-24 bg-primary/5 rounded-full" />
-
-          {/* Security badge */}
-          <div className="flex items-center gap-2 bg-sage-light/50 text-sage rounded-lg px-3 py-2 mb-6 text-xs relative">
-            <Shield className="h-3.5 w-3.5 flex-shrink-0" />
-            <span>Conexión segura con cifrado SSL/TLS</span>
-          </div>
-
+        <div className="bg-card/80 backdrop-blur-sm rounded-2xl shadow-xl border border-border/40 p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {!isLogin && (
               <div>
@@ -205,24 +194,17 @@ function AuthPage() {
                 </button>
               </div>
 
-              {!isLogin && password.length > 0 && (
+              {!isLogin && password.length > 0 && passwordErrors.length > 0 && (
                 <div className="mt-2 space-y-1">
-                  {passwordErrors.length > 0 ? (
-                    passwordErrors.map((err, i) => (
-                      <p key={i} className="text-xs text-destructive flex items-center gap-1">
-                        <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {err}
-                      </p>
-                    ))
-                  ) : (
-                    <p className="text-xs text-secondary flex items-center gap-1">
-                      <Shield className="h-3 w-3" /> Contraseña segura
+                  {passwordErrors.map((err, i) => (
+                    <p key={i} className="text-xs text-destructive flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {err}
                     </p>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* CAPTCHA */}
             <CaptchaChallenge onVerified={setCaptchaVerified} />
 
             {error && (
@@ -233,8 +215,7 @@ function AuthPage() {
             )}
 
             {success && (
-              <div className="bg-secondary/10 text-secondary rounded-lg px-3 py-2 text-sm flex items-center gap-2">
-                <Shield className="h-4 w-4 flex-shrink-0" />
+              <div className="bg-green-500/10 text-green-700 rounded-lg px-3 py-2 text-sm">
                 {success}
               </div>
             )}
@@ -255,28 +236,6 @@ function AuthPage() {
             >
               {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
             </button>
-          </div>
-
-          {/* Security info */}
-          <div className="mt-6 pt-4 border-t border-border/50">
-            <div className="grid grid-cols-2 gap-3 text-[10px] text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Shield className="h-3 w-3 text-secondary" />
-                Cifrado AES-256
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Lock className="h-3 w-3 text-secondary" />
-                Protección XSS
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Shield className="h-3 w-3 text-secondary" />
-                Anti SQL Injection
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Lock className="h-3 w-3 text-secondary" />
-                CAPTCHA activo
-              </div>
-            </div>
           </div>
         </div>
       </motion.div>
