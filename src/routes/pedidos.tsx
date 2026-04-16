@@ -73,7 +73,10 @@ function PedidosPage() {
         return;
       }
 
-      let enrichedOrders = (data || []) as Order[];
+      let enrichedOrders = (data || []).map(d => ({
+        ...d,
+        items: d.items as unknown as OrderItem[],
+      })) as Order[];
 
       // If admin, fetch user profiles to show names
       if (isAdmin && enrichedOrders.length > 0) {
@@ -98,7 +101,7 @@ function PedidosPage() {
     }
   };
 
-  const updateStatus = async (orderId: string, newStatus: string) => {
+  const updateStatus = async (orderId: string, newStatus: "pendiente" | "confirmado" | "enviado" | "entregado" | "cancelado") => {
     const { error } = await supabase
       .from("orders")
       .update({ status: newStatus })
