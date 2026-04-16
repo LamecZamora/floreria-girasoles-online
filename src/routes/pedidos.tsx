@@ -232,7 +232,7 @@ function PedidosPage() {
                             {Object.entries(STATUS_CONFIG).map(([key, val]) => (
                               <button
                                 key={key}
-                                onClick={() => updateStatus(order.id, key)}
+                                onClick={() => updateStatus(order.id, key as "pendiente" | "confirmado" | "enviado" | "entregado" | "cancelado")}
                                 disabled={order.status === key}
                                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                                   order.status === key
