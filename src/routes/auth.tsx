@@ -207,7 +207,7 @@ function AuthPage() {
               )}
             </div>
 
-            <CaptchaChallenge onVerified={setCaptchaVerified} />
+            <CaptchaChallenge key={captchaKey} onVerified={setCaptchaVerified} />
 
             {error && (
               <div className="bg-destructive/10 text-destructive rounded-lg px-3 py-2 text-sm flex items-center gap-2">
