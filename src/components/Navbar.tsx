@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { ShoppingCart, Menu, X, User, LogOut, Settings } from "lucide-react";
+import { ShoppingCart, Menu, X, User, LogOut, Settings, ClipboardList } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
