@@ -45,6 +45,7 @@ function AuthPage() {
     setSuccess("");
     setPasswordErrors([]);
     setCaptchaVerified(false);
+    setCaptchaKey(k => k + 1);
   }, []);
 
   if (user) {
