@@ -35,6 +35,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
