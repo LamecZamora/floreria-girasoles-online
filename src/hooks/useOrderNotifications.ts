@@ -17,11 +17,15 @@ export function useOrderNotifications() {
   useEffect(() => {
     if (loading || !user) return;
 
+    // Set Realtime auth so private channel subscriptions are validated by RLS
+    supabase.realtime.setAuth();
+
     // Clean any prior channel
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
+
 
     if (isAdmin) {
       // Admin: listen for ANY new order on the dedicated admin channel
