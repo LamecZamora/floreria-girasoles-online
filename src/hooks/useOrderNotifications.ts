@@ -57,7 +57,7 @@ export function useOrderNotifications() {
     } else {
       // Client: listen for status updates on their own orders
       const channel = supabase
-        .channel(`client-orders-${user.id}`)
+        .channel(`orders:${user.id}`, { config: { private: true } })
         .on(
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "orders", filter: `user_id=eq.${user.id}` },
