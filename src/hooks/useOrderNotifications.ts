@@ -17,16 +17,20 @@ export function useOrderNotifications() {
   useEffect(() => {
     if (loading || !user) return;
 
+    // Set Realtime auth so private channel subscriptions are validated by RLS
+    supabase.realtime.setAuth();
+
     // Clean any prior channel
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
 
+
     if (isAdmin) {
-      // Admin: listen for ANY new order
+      // Admin: listen for ANY new order on the dedicated admin channel
       const channel = supabase
-        .channel("admin-orders")
+        .channel("orders:admin", { config: { private: true } })
         .on(
           "postgres_changes",
           { event: "INSERT", schema: "public", table: "orders" },
@@ -57,7 +61,7 @@ export function useOrderNotifications() {
     } else {
       // Client: listen for status updates on their own orders
       const channel = supabase
-        .channel(`client-orders-${user.id}`)
+        .channel(`orders:${user.id}`, { config: { private: true } })
         .on(
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "orders", filter: `user_id=eq.${user.id}` },
