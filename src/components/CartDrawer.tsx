@@ -1,10 +1,12 @@
 import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import CheckoutDialog from "./CheckoutDialog";
 
 const CartDrawer = () => {
   const { items, removeItem, updateQuantity, total, isOpen, setIsOpen, clearCart } = useCart();
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -116,7 +118,7 @@ const CartDrawer = () => {
                     <span>Total:</span>
                     <span className="text-primary font-heading text-xl">${total.toLocaleString("es-MX")} MXN</span>
                   </div>
-                  <button className="w-full btn-primary py-3.5">
+                  <button onClick={() => setCheckoutOpen(true)} className="w-full btn-primary py-3.5">
                     Proceder al Pago <ArrowRight className="h-4 w-4" />
                   </button>
                   <button onClick={clearCart} className="w-full text-sm text-muted-foreground hover:text-destructive transition-colors py-1">
@@ -126,6 +128,7 @@ const CartDrawer = () => {
               </>
             )}
           </motion.div>
+          <CheckoutDialog open={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
         </div>
       )}
     </AnimatePresence>
