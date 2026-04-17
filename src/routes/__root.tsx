@@ -5,6 +5,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import OrderNotifications from "@/components/OrderNotifications";
+import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -61,6 +63,7 @@ function RootComponent() {
   return (
     <AuthProvider>
       <CartProvider>
+        <OrderNotifications />
         <Navbar />
         <CartDrawer />
         <main className="min-h-screen">
@@ -68,6 +71,7 @@ function RootComponent() {
         </main>
         <Footer />
         <WhatsAppButton />
+        <Toaster position="top-right" richColors closeButton />
       </CartProvider>
     </AuthProvider>
   );
