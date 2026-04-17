@@ -24,9 +24,9 @@ export function useOrderNotifications() {
     }
 
     if (isAdmin) {
-      // Admin: listen for ANY new order
+      // Admin: listen for ANY new order on the dedicated admin channel
       const channel = supabase
-        .channel("admin-orders")
+        .channel("orders:admin", { config: { private: true } })
         .on(
           "postgres_changes",
           { event: "INSERT", schema: "public", table: "orders" },
