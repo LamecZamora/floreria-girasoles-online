@@ -87,6 +87,10 @@ function AuthPage() {
         const { error } = await signIn(email.trim(), password);
         if (error) setError(translateAuthError(error));
         else navigate({ to: "/" });
+      } else if (isForgot) {
+        const { error } = await resetPassword(email.trim());
+        if (error) setError(translateAuthError(error));
+        else setSuccess("Si el email existe, recibirás un enlace para restablecer tu contraseña.");
       } else {
         const nameResult = nameSchema.safeParse(fullName);
         if (!nameResult.success) {
