@@ -181,43 +181,57 @@ function AuthPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Contraseña</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (!isLogin) validatePassword(e.target.value);
-                  }}
-                  placeholder="••••••••"
-                  maxLength={128}
-                  autoComplete={isLogin ? "current-password" : "new-password"}
-                  required
-                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-
-              {!isLogin && password.length > 0 && passwordErrors.length > 0 && (
-                <div className="mt-2 space-y-1">
-                  {passwordErrors.map((err, i) => (
-                    <p key={i} className="text-xs text-destructive flex items-center gap-1">
-                      <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {err}
-                    </p>
-                  ))}
+            {!isForgot && (
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Contraseña</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (isSignup) validatePassword(e.target.value);
+                    }}
+                    placeholder="••••••••"
+                    maxLength={128}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    required
+                    className="w-full pl-10 pr-12 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
-              )}
-            </div>
+
+                {isSignup && password.length > 0 && passwordErrors.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {passwordErrors.map((err, i) => (
+                      <p key={i} className="text-xs text-destructive flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {err}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                {isLogin && (
+                  <div className="mt-2 text-right">
+                    <button
+                      type="button"
+                      onClick={() => switchMode("forgot")}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             <CaptchaChallenge key={captchaKey} onVerified={setCaptchaVerified} />
 
@@ -239,17 +253,26 @@ function AuthPage() {
               disabled={loading || !captchaVerified}
               className="w-full btn-primary py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Procesando..." : isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
+              {loading ? "Procesando..." : isLogin ? "Iniciar Sesión" : isForgot ? "Enviar enlace" : "Crear Cuenta"}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={switchMode}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
-            </button>
+          <div className="mt-6 text-center space-y-2">
+            {isForgot ? (
+              <button
+                onClick={() => switchMode("login")}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                ← Volver a iniciar sesión
+              </button>
+            ) : (
+              <button
+                onClick={() => switchMode(isLogin ? "signup" : "login")}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
+              </button>
+            )}
           </div>
         </div>
       </motion.div>
