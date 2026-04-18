@@ -24,8 +24,10 @@ const passwordSchema = z.string().min(8, "Mínimo 8 caracteres").max(128, "Máxi
   .regex(/[^A-Za-z0-9]/, "Debe contener al menos un carácter especial");
 const nameSchema = z.string().trim().min(2, "Mínimo 2 caracteres").max(100, "Máximo 100 caracteres");
 
+type Mode = "login" | "signup" | "forgot";
+
 function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -36,11 +38,15 @@ function AuthPage() {
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [captchaKey, setCaptchaKey] = useState(0);
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
-  const switchMode = useCallback(() => {
-    setIsLogin(v => !v);
+  const isLogin = mode === "login";
+  const isSignup = mode === "signup";
+  const isForgot = mode === "forgot";
+
+  const switchMode = useCallback((next: Mode) => {
+    setMode(next);
     setError("");
     setSuccess("");
     setPasswordErrors([]);
