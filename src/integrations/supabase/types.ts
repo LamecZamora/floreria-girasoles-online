@@ -50,6 +50,27 @@ export type Database = {
         }
         Relationships: []
       }
+      product_prices: {
+        Row: {
+          name: string
+          price: number
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          name: string
+          price: number
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          name?: string
+          price?: number
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -103,6 +124,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_order: {
+        Args: { _delivery_address: string; _items: Json; _notes?: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
