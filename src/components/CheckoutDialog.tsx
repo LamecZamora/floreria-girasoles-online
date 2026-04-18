@@ -36,21 +36,17 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     }
     setSubmitting(true);
 
+    // Send only product_id + quantity. The server (create_order RPC)
+    // looks up authoritative prices and computes the total.
     const orderItems = items.map(i => ({
       id: i.product.id,
-      name: i.product.name,
-      price: i.product.price,
       quantity: i.quantity,
-      image: i.product.image,
     }));
 
-    const { error } = await supabase.from("orders").insert({
-      user_id: user.id,
-      items: orderItems,
-      total,
-      status: "pendiente",
-      delivery_address: address.trim(),
-      notes: notes.trim() || null,
+    const { error } = await supabase.rpc("create_order", {
+      _items: orderItems,
+      _delivery_address: address.trim(),
+      _notes: notes.trim() || null,
     });
 
     setSubmitting(false);
