@@ -24,8 +24,10 @@ const passwordSchema = z.string().min(8, "Mínimo 8 caracteres").max(128, "Máxi
   .regex(/[^A-Za-z0-9]/, "Debe contener al menos un carácter especial");
 const nameSchema = z.string().trim().min(2, "Mínimo 2 caracteres").max(100, "Máximo 100 caracteres");
 
+type Mode = "login" | "signup" | "forgot";
+
 function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -36,11 +38,15 @@ function AuthPage() {
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [captchaKey, setCaptchaKey] = useState(0);
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
-  const switchMode = useCallback(() => {
-    setIsLogin(v => !v);
+  const isLogin = mode === "login";
+  const isSignup = mode === "signup";
+  const isForgot = mode === "forgot";
+
+  const switchMode = useCallback((next: Mode) => {
+    setMode(next);
     setError("");
     setSuccess("");
     setPasswordErrors([]);
@@ -81,6 +87,10 @@ function AuthPage() {
         const { error } = await signIn(email.trim(), password);
         if (error) setError(translateAuthError(error));
         else navigate({ to: "/" });
+      } else if (isForgot) {
+        const { error } = await resetPassword(email.trim());
+        if (error) setError(translateAuthError(error));
+        else setSuccess("Si el email existe, recibirás un enlace para restablecer tu contraseña.");
       } else {
         const nameResult = nameSchema.safeParse(fullName);
         if (!nameResult.success) {
@@ -127,13 +137,15 @@ function AuthPage() {
             </span>
           </Link>
           <p className="text-muted-foreground mt-3 text-sm">
-            {isLogin ? "Bienvenido de vuelta 🌻" : "Crea tu cuenta para empezar"}
+            {isLogin && "Bienvenido de vuelta 🌻"}
+            {isSignup && "Crea tu cuenta para empezar"}
+            {isForgot && "Te enviaremos un enlace para recuperarla"}
           </p>
         </div>
 
         <div className="bg-card/80 backdrop-blur-sm rounded-2xl shadow-xl border border-border/40 p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            {!isLogin && (
+            {isSignup && (
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">Nombre completo</label>
                 <div className="relative">
@@ -169,43 +181,57 @@ function AuthPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Contraseña</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (!isLogin) validatePassword(e.target.value);
-                  }}
-                  placeholder="••••••••"
-                  maxLength={128}
-                  autoComplete={isLogin ? "current-password" : "new-password"}
-                  required
-                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-
-              {!isLogin && password.length > 0 && passwordErrors.length > 0 && (
-                <div className="mt-2 space-y-1">
-                  {passwordErrors.map((err, i) => (
-                    <p key={i} className="text-xs text-destructive flex items-center gap-1">
-                      <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {err}
-                    </p>
-                  ))}
+            {!isForgot && (
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Contraseña</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (isSignup) validatePassword(e.target.value);
+                    }}
+                    placeholder="••••••••"
+                    maxLength={128}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    required
+                    className="w-full pl-10 pr-12 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
-              )}
-            </div>
+
+                {isSignup && password.length > 0 && passwordErrors.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {passwordErrors.map((err, i) => (
+                      <p key={i} className="text-xs text-destructive flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {err}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                {isLogin && (
+                  <div className="mt-2 text-right">
+                    <button
+                      type="button"
+                      onClick={() => switchMode("forgot")}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             <CaptchaChallenge key={captchaKey} onVerified={setCaptchaVerified} />
 
@@ -227,17 +253,26 @@ function AuthPage() {
               disabled={loading || !captchaVerified}
               className="w-full btn-primary py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Procesando..." : isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
+              {loading ? "Procesando..." : isLogin ? "Iniciar Sesión" : isForgot ? "Enviar enlace" : "Crear Cuenta"}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={switchMode}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
-            </button>
+          <div className="mt-6 text-center space-y-2">
+            {isForgot ? (
+              <button
+                onClick={() => switchMode("login")}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                ← Volver a iniciar sesión
+              </button>
+            ) : (
+              <button
+                onClick={() => switchMode(isLogin ? "signup" : "login")}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
+              </button>
+            )}
           </div>
         </div>
       </motion.div>
