@@ -137,13 +137,15 @@ function AuthPage() {
             </span>
           </Link>
           <p className="text-muted-foreground mt-3 text-sm">
-            {isLogin ? "Bienvenido de vuelta 🌻" : "Crea tu cuenta para empezar"}
+            {isLogin && "Bienvenido de vuelta 🌻"}
+            {isSignup && "Crea tu cuenta para empezar"}
+            {isForgot && "Te enviaremos un enlace para recuperarla"}
           </p>
         </div>
 
         <div className="bg-card/80 backdrop-blur-sm rounded-2xl shadow-xl border border-border/40 p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            {!isLogin && (
+            {isSignup && (
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1.5">Nombre completo</label>
                 <div className="relative">
