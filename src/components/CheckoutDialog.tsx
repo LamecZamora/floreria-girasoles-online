@@ -36,6 +36,15 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     }
     setSubmitting(true);
 
+    // Capture cart snapshot BEFORE clearing (for WhatsApp message)
+    const cartSnapshot = items.map(i => ({
+      name: i.product.name,
+      quantity: i.quantity,
+      price: i.product.price,
+      subtotal: i.product.price * i.quantity,
+    }));
+    const totalSnapshot = total;
+
     // Send only product_id + quantity. The server (create_order RPC)
     // looks up authoritative prices and computes the total.
     const orderItems = items.map(i => ({
@@ -43,7 +52,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
       quantity: i.quantity,
     }));
 
-    const { error } = await supabase.rpc("create_order", {
+    const { data: orderId, error } = await supabase.rpc("create_order", {
       _items: orderItems,
       _delivery_address: address.trim(),
       _notes: notes.trim() || undefined,
@@ -54,6 +63,26 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
       toast.error("No se pudo crear el pedido. Intenta de nuevo.");
       return;
     }
+
+    // Build WhatsApp message and open wa.me
+    const orderRef = typeof orderId === "string" ? orderId.slice(0, 8).toUpperCase() : "NUEVO";
+    const itemsText = cartSnapshot
+      .map(i => `• ${i.quantity}x ${i.name} — $${i.subtotal.toLocaleString("es-MX")}`)
+      .join("\n");
+    const customerName = user.user_metadata?.full_name || user.email || "Cliente";
+    const message =
+      `🌻 *NUEVO PEDIDO #${orderRef}*\n\n` +
+      `👤 *Cliente:* ${customerName}\n` +
+      `📧 *Email:* ${user.email}\n\n` +
+      `📦 *Productos:*\n${itemsText}\n\n` +
+      `💰 *Total: $${totalSnapshot.toLocaleString("es-MX")} MXN*\n\n` +
+      `📍 *Dirección de entrega:*\n${address.trim()}` +
+      (notes.trim() ? `\n\n📝 *Notas:*\n${notes.trim()}` : "");
+
+    const FLORERIA_WHATSAPP = "5216181169706"; // +52 618 116 9706
+    const waUrl = `https://wa.me/${FLORERIA_WHATSAPP}?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+
     setSuccess(true);
     clearCart();
     setTimeout(() => {
