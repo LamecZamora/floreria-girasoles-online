@@ -46,7 +46,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     const { error } = await supabase.rpc("create_order", {
       _items: orderItems,
       _delivery_address: address.trim(),
-      _notes: notes.trim() || null,
+      _notes: notes.trim() || undefined,
     });
 
     setSubmitting(false);
