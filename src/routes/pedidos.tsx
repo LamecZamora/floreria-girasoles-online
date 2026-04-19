@@ -2,7 +2,24 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
+import { Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, ArrowLeft, MessageCircle } from "lucide-react";
+
+const FLORERIA_WHATSAPP = "5216181169706";
+
+const buildWhatsAppMessage = (order: Order, items: OrderItem[]) => {
+  const ref = order.id.slice(0, 8).toUpperCase();
+  const itemsText = items
+    .map(i => `• ${i.quantity}x ${i.name} — $${(i.price * i.quantity).toLocaleString("es-MX")}`)
+    .join("\n");
+  return (
+    `🌻 *PEDIDO #${ref}*\n\n` +
+    (order.user_name ? `👤 *Cliente:* ${order.user_name}\n` : "") +
+    `📦 *Productos:*\n${itemsText}\n\n` +
+    `💰 *Total: $${Number(order.total).toLocaleString("es-MX")} MXN*\n\n` +
+    (order.delivery_address ? `📍 *Dirección:*\n${order.delivery_address}` : "") +
+    (order.notes ? `\n\n📝 *Notas:*\n${order.notes}` : "")
+  );
+};
 
 export const Route = createFileRoute("/pedidos")({
   component: PedidosPage,
@@ -225,6 +242,18 @@ function PedidosPage() {
                           <p className="text-sm text-foreground">{order.notes}</p>
                         </div>
                       )}
+
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        <a
+                          href={`https://wa.me/${FLORERIA_WHATSAPP}?text=${encodeURIComponent(buildWhatsAppMessage(order, items))}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-lg bg-green-500/10 text-green-700 hover:bg-green-500/20 transition-colors font-medium"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          {isAdmin ? "Enviar por WhatsApp" : "Consultar por WhatsApp"}
+                        </a>
+                      </div>
 
                       {isAdmin && (
                         <div>
