@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, Mail, Lock, User, AlertTriangle, Flower2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -54,10 +54,12 @@ function AuthPage() {
     setCaptchaKey(k => k + 1);
   }, []);
 
-  if (user) {
-    navigate({ to: "/" });
-    return null;
-  }
+  // Redirect inside effect to avoid setState during render warnings
+  useEffect(() => {
+    if (user) navigate({ to: "/" });
+  }, [user, navigate]);
+
+  if (user) return null;
 
   const validatePassword = (pwd: string) => {
     const result = passwordSchema.safeParse(pwd);
