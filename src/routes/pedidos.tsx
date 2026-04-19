@@ -57,6 +57,7 @@ function PedidosPage() {
       return;
     }
     fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, isAdmin]);
 
   const fetchOrders = async () => {

@@ -42,14 +42,14 @@ const CategoryFilter = ({ selected, onSelect }: CategoryFilterProps) => {
   return (
     <div
       ref={scrollRef}
-      className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 px-1 -mx-1 snap-x snap-mandatory md:flex-wrap md:justify-center md:overflow-visible md:pb-0"
+      className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 px-4 -mx-4 sm:px-1 sm:-mx-1 snap-x snap-mandatory md:flex-wrap md:justify-center md:overflow-visible md:pb-0 md:px-0 md:mx-0"
     >
       {categories.map((cat) => (
         <button
           key={cat}
           ref={selected === cat ? selectedRef : undefined}
           onClick={() => onSelect(cat)}
-          className={`flex-shrink-0 snap-start flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap border ${
+          className={`flex-shrink-0 snap-start flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap border active:scale-95 ${
             selected === cat
               ? "bg-primary text-primary-foreground border-primary shadow-[0_4px_16px_-4px_oklch(0.38_0.08_160/0.3)]"
               : "bg-card text-muted-foreground border-border/50 hover:border-primary/30 hover:text-foreground"
