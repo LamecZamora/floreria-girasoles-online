@@ -44,7 +44,7 @@ function CatalogoPage() {
       </div>
 
       {/* Search & Sort */}
-      <div className="max-w-2xl mx-auto mb-8 flex gap-2">
+      <div className="max-w-2xl mx-auto mb-8 flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
@@ -68,7 +68,7 @@ function CatalogoPage() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as "default" | "price-asc" | "price-desc")}
-          className="px-3 py-3 rounded-lg border border-border bg-card text-foreground text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="px-3 py-3 rounded-lg border border-border bg-card text-foreground text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40 sm:w-auto"
           aria-label="Ordenar por"
         >
           <option value="default">Ordenar</option>

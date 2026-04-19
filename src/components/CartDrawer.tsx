@@ -31,21 +31,21 @@ const CartDrawer = () => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="absolute right-0 top-0 h-full w-full sm:max-w-md bg-card shadow-2xl flex flex-col"
+            className="absolute right-0 top-0 h-[100dvh] w-full sm:max-w-md bg-card shadow-2xl flex flex-col"
           >
-            <div className="flex items-center justify-between p-5 border-b border-border safe-top">
-              <h2 className="font-heading text-xl font-semibold text-foreground flex items-center gap-3">
-                <div className="p-2 bg-primary/8 rounded-lg">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-border safe-top">
+              <h2 className="font-heading text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="p-2 bg-primary/8 rounded-lg flex-shrink-0">
                   <ShoppingBag className="h-5 w-5 text-primary" />
                 </div>
-                Tu Carrito
+                <span className="truncate">Tu Carrito</span>
                 {items.length > 0 && (
-                  <span className="text-xs bg-muted text-muted-foreground px-2.5 py-0.5 rounded-full font-medium">
+                  <span className="text-xs bg-muted text-muted-foreground px-2.5 py-0.5 rounded-full font-medium flex-shrink-0">
                     {items.length}
                   </span>
                 )}
               </h2>
-              <button onClick={() => setIsOpen(false)} className="p-2.5 hover:bg-muted rounded-lg transition-all" aria-label="Cerrar carrito">
+              <button onClick={() => setIsOpen(false)} className="p-2.5 hover:bg-muted rounded-lg transition-all flex-shrink-0" aria-label="Cerrar carrito">
                 <X className="h-5 w-5" />
               </button>
             </div>

@@ -66,21 +66,21 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
       </div>
 
       <div className="p-3 sm:p-4">
-        <h3 className="font-heading text-base sm:text-lg font-semibold text-foreground mb-1 line-clamp-1">
+        <h3 className="font-heading text-sm sm:text-lg font-semibold text-foreground mb-1 line-clamp-1">
           {product.name}
         </h3>
         <p className="text-muted-foreground text-xs sm:text-sm mb-3 line-clamp-2 leading-relaxed">
           {product.description}
         </p>
         <div className="flex items-center justify-between gap-2">
-          <span className="text-lg sm:text-xl font-bold text-primary">
+          <span className="text-base sm:text-xl font-bold text-primary whitespace-nowrap">
             ${product.price.toLocaleString("es-MX")}
           </span>
           <button
             onClick={handleAdd}
             disabled={isOutOfStock}
             aria-label={`Agregar ${product.name} al carrito`}
-            className={`flex items-center gap-1.5 px-3 sm:px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-300 ${
+            className={`flex items-center justify-center gap-1.5 p-2.5 sm:px-4 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-300 min-w-[40px] ${
               added
                 ? "bg-secondary text-secondary-foreground shadow-md"
                 : isOutOfStock
