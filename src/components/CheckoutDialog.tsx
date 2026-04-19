@@ -60,7 +60,15 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
 
     setSubmitting(false);
     if (error) {
-      toast.error("No se pudo crear el pedido. Intenta de nuevo.");
+      console.error("create_order error:", error);
+      const msg = error.message?.includes("Authentication")
+        ? "Tu sesión expiró. Inicia sesión de nuevo."
+        : error.message?.includes("Invalid delivery")
+        ? "La dirección de entrega no es válida."
+        : error.message?.includes("Cart is empty")
+        ? "Tu carrito está vacío."
+        : "No se pudo crear el pedido. Intenta de nuevo.";
+      toast.error(msg);
       return;
     }
 
