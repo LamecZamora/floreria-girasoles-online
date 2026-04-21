@@ -43,11 +43,11 @@ const Navbar = () => {
           : "bg-card/70 backdrop-blur-md border-b border-border/30"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5 min-w-0" onClick={() => setMobileOpen(false)}>
-          <img src={logo} alt="Florería Girasoles" className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 rounded-full shadow-sm" />
-          <span className="font-heading text-lg sm:text-xl font-bold text-foreground truncate">
-            Florería <span className="text-primary">Girasoles</span>
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+        <Link to="/" className="flex items-center gap-2 sm:gap-2.5 min-w-0" onClick={() => setMobileOpen(false)}>
+          <img src={logo} alt="Florería Girasoles" className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 rounded-full shadow-sm" />
+          <span className="font-heading text-base sm:text-xl font-bold text-foreground truncate">
+            <span className="hidden xs:inline">Florería </span><span className="text-primary">Girasoles</span>
           </span>
         </Link>
 
