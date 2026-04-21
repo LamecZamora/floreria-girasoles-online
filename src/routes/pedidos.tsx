@@ -185,15 +185,15 @@ function PedidosPage() {
 
               return (
                 <div key={order.id} className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
-                  <button
-                    onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
-                    className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-muted/30 transition-colors"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`p-2 rounded-xl ${config.color}`}>
+                  <div className="w-full flex items-center justify-between p-4 sm:p-5 gap-2">
+                    <button
+                      onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
+                      className="flex items-center gap-3 min-w-0 flex-1 text-left hover:opacity-80 transition-opacity"
+                    >
+                      <div className={`p-2 rounded-xl ${config.color} flex-shrink-0`}>
                         <StatusIcon className="h-5 w-5" />
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-medium text-foreground text-sm">
                             Pedido #{order.id.slice(0, 8)}
@@ -211,12 +211,37 @@ function PedidosPage() {
                           )}
                         </p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-foreground">${Number(order.total).toFixed(2)}</span>
+                    </button>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="font-bold text-foreground hidden sm:inline">${Number(order.total).toFixed(2)}</span>
                       {isExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
                     </div>
-                  </button>
+                  </div>
+
+                  {/* Quick admin actions on collapsed card */}
+                  {isAdmin && order.status === "pendiente" && !isExpanded && (
+                    <div className="px-4 sm:px-5 pb-4 flex gap-2 border-t border-border/30 pt-3">
+                      <button
+                        onClick={() => updateStatus(order.id, "confirmado")}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-green-500/10 text-green-700 hover:bg-green-500/20 font-semibold text-sm transition-colors"
+                      >
+                        <Check className="h-4 w-4" /> Confirmar
+                      </button>
+                      <button
+                        onClick={() => updateStatus(order.id, "cancelado")}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-yellow-500/10 text-yellow-700 hover:bg-yellow-500/20 font-semibold text-sm transition-colors"
+                      >
+                        <XIcon className="h-4 w-4" /> Cancelar
+                      </button>
+                      <button
+                        onClick={() => deleteOrder(order.id)}
+                        className="flex items-center justify-center py-2.5 px-3 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+                        aria-label="Eliminar"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
 
                   {isExpanded && (
                     <div className="border-t border-border/50 p-4 sm:p-5 space-y-4">
