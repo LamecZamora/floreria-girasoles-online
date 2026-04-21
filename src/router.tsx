@@ -59,7 +59,14 @@ export const getRouter = () => {
     routeTree,
     context: {},
     scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
+    // Preload route chunks + data on hover/touchstart for near-instant navigation
+    defaultPreload: "intent",
+    // Cache preloaded data for 30s so re-hover doesn't refetch
+    defaultPreloadStaleTime: 30_000,
+    // Keep loaded route data fresh for 60s to avoid re-fetching on back/forward
+    defaultStaleTime: 60_000,
+    // GC unused route caches after 10 minutes
+    defaultGcTime: 10 * 60_000,
     defaultErrorComponent: DefaultErrorComponent,
   });
 
