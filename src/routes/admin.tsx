@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { Shield, Users, Package, LogOut, AlertTriangle } from "lucide-react";
+import { Shield, Users, Package, LogOut, AlertTriangle, ClipboardList, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 
