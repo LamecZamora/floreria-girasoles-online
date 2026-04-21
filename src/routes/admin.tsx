@@ -97,61 +97,92 @@ function AdminPage() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-8">
           <div>
-            <h1 className="section-heading text-3xl sm:text-4xl">Panel de Administración</h1>
-            <p className="text-muted-foreground mt-1 text-sm">Gestión segura del sistema</p>
+            <h1 className="section-heading text-2xl sm:text-4xl">Panel de Administración</h1>
+            <p className="text-muted-foreground mt-1 text-xs sm:text-sm">Gestión segura del sistema</p>
           </div>
           <button
             onClick={async () => { await signOut(); navigate({ to: "/" }); }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-all text-sm"
+            className="self-start sm:self-auto flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-all text-xs sm:text-sm"
           >
             <LogOut className="h-4 w-4" /> Cerrar sesión
           </button>
         </div>
 
+        {/* Quick actions */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <Link to="/admin/productos" className="group bg-card rounded-2xl border border-border/50 p-5 hover:border-primary/40 hover:shadow-lg transition-all flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-primary/10 text-primary flex-shrink-0">
+              <Package className="h-6 w-6" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-heading font-semibold text-foreground text-base sm:text-lg">Gestión de Productos</p>
+              <p className="text-xs text-muted-foreground">{productCount} productos · Crear, editar, eliminar</p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+          </Link>
+          <Link to="/pedidos" className="group bg-card rounded-2xl border border-border/50 p-5 hover:border-accent/40 hover:shadow-lg transition-all flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-accent/10 text-accent flex-shrink-0 relative">
+              <ClipboardList className="h-6 w-6" />
+              {pendingCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
+                  {pendingCount}
+                </span>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-heading font-semibold text-foreground text-base sm:text-lg">Pedidos</p>
+              <p className="text-xs text-muted-foreground">
+                {pendingCount > 0 ? `${pendingCount} pendiente${pendingCount === 1 ? "" : "s"} · ` : ""}Confirmar, cancelar, eliminar
+              </p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all flex-shrink-0" />
+          </Link>
+        </div>
+
         {/* Security status cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-6 sm:mb-8">
           {[
-            { icon: Shield, label: "HTTPS/SSL", status: "Activo", color: "text-secondary bg-secondary/10" },
-            { icon: Shield, label: "RLS Activo", status: "Protegido", color: "text-secondary bg-secondary/10" },
-            { icon: Shield, label: "Anti XSS", status: "Activo", color: "text-secondary bg-secondary/10" },
-            { icon: Shield, label: "Anti SQL Injection", status: "Activo", color: "text-secondary bg-secondary/10" },
-          ].map(({ icon: Icon, label, status, color }) => (
-            <div key={label} className="bg-card rounded-xl border border-border/50 p-4 flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${color}`}>
-                <Icon className="h-5 w-5" />
+            { icon: Shield, label: "HTTPS/SSL", status: "Activo" },
+            { icon: Shield, label: "RLS Activo", status: "Protegido" },
+            { icon: Shield, label: "Anti XSS", status: "Activo" },
+            { icon: Shield, label: "Anti SQLi", status: "Activo" },
+          ].map(({ icon: Icon, label, status }) => (
+            <div key={label} className="bg-card rounded-xl border border-border/50 p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 rounded-lg text-secondary bg-secondary/10 flex-shrink-0">
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div>
-                <p className="font-medium text-foreground text-sm">{label}</p>
-                <p className="text-xs text-muted-foreground">{status}</p>
+              <div className="min-w-0">
+                <p className="font-medium text-foreground text-xs sm:text-sm truncate">{label}</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">{status}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-card rounded-xl border border-border/50 p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <Users className="h-5 w-5 text-primary" />
-              <span className="text-sm text-muted-foreground">Usuarios registrados</span>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-card rounded-xl border border-border/50 p-3 sm:p-5">
+            <div className="flex items-center gap-2 mb-1 sm:mb-2">
+              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Usuarios</span>
             </div>
-            <p className="text-3xl font-heading font-bold text-foreground">{users.length}</p>
+            <p className="text-xl sm:text-3xl font-heading font-bold text-foreground">{users.length}</p>
           </div>
-          <div className="bg-card rounded-xl border border-border/50 p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <Package className="h-5 w-5 text-accent" />
-              <span className="text-sm text-muted-foreground">Productos</span>
+          <div className="bg-card rounded-xl border border-border/50 p-3 sm:p-5">
+            <div className="flex items-center gap-2 mb-1 sm:mb-2">
+              <Package className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
+              <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Productos</span>
             </div>
-            <p className="text-3xl font-heading font-bold text-foreground">150+</p>
+            <p className="text-xl sm:text-3xl font-heading font-bold text-foreground">{productCount}</p>
           </div>
-          <div className="bg-card rounded-xl border border-border/50 p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <Shield className="h-5 w-5 text-secondary" />
-              <span className="text-sm text-muted-foreground">Nivel de seguridad</span>
+          <div className="bg-card rounded-xl border border-border/50 p-3 sm:p-5">
+            <div className="flex items-center gap-2 mb-1 sm:mb-2">
+              <ClipboardList className="h-4 w-4 sm:h-5 sm:w-5 text-secondary" />
+              <span className="text-[10px] sm:text-sm text-muted-foreground truncate">Pendientes</span>
             </div>
-            <p className="text-3xl font-heading font-bold text-secondary">Alto</p>
+            <p className="text-xl sm:text-3xl font-heading font-bold text-secondary">{pendingCount}</p>
           </div>
         </div>
 
