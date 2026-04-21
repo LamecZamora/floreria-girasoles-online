@@ -59,6 +59,15 @@ const Navbar = () => {
           {user && (
             <NavItem to="/pedidos" label="Pedidos" active={location.pathname === "/pedidos"} icon={<ClipboardList className="h-3.5 w-3.5" />} />
           )}
+          {user && (
+            <NavItem
+              to="/seguridad"
+              label="Seguridad"
+              active={location.pathname === "/seguridad"}
+              icon={needs2FA ? <ShieldAlert className="h-3.5 w-3.5 text-accent" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+              alert={needs2FA}
+            />
+          )}
           {isAdmin && (
             <NavItem to="/admin" label="Admin" active={location.pathname === "/admin"} icon={<Settings className="h-3.5 w-3.5" />} />
           )}
