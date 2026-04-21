@@ -141,12 +141,12 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background-image: url("/src/assets/floral-bg.webp");
+    background-image: url("/floral-bg.webp");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    opacity: 0.18;
+    opacity: 0.22;
   }
 
   h1, h2, h3, h4, h5, h6 {
