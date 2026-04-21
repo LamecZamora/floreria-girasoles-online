@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, ArrowLeft, MessageCircle } from "lucide-react";
+import { Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, ArrowLeft, MessageCircle, Trash2, Check, X as XIcon } from "lucide-react";
 
 const FLORERIA_WHATSAPP = "5216181169706";
 
@@ -127,6 +127,17 @@ function PedidosPage() {
 
     if (!error) {
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    }
+  };
+
+  const deleteOrder = async (orderId: string) => {
+    if (!confirm("¿Eliminar este pedido permanentemente? Esta acción no se puede deshacer.")) return;
+    const { error } = await supabase.from("orders").delete().eq("id", orderId);
+    if (error) {
+      alert("Error al eliminar: " + error.message);
+    } else {
+      setOrders(prev => prev.filter(o => o.id !== orderId));
+      if (expandedOrder === orderId) setExpandedOrder(null);
     }
   };
 
