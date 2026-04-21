@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Eye, EyeOff, Mail, Lock, User, AlertTriangle, Flower2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { Eye, EyeOff, Mail, Lock, User, AlertTriangle, Flower2, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
 import CaptchaChallenge, { type CaptchaHandle } from "@/components/CaptchaChallenge";
 
@@ -26,6 +26,17 @@ const nameSchema = z.string().trim().min(2, "Mínimo 2 caracteres").max(100, "M�
 
 type Mode = "login" | "signup" | "forgot";
 
+// Password strength helpers (computed cheaply on each render — inputs are short)
+function computePasswordChecks(pwd: string) {
+  return [
+    { label: "8+ caracteres", ok: pwd.length >= 8 },
+    { label: "Mayúscula", ok: /[A-Z]/.test(pwd) },
+    { label: "Minúscula", ok: /[a-z]/.test(pwd) },
+    { label: "Número", ok: /[0-9]/.test(pwd) },
+    { label: "Símbolo", ok: /[^A-Za-z0-9]/.test(pwd) },
+  ];
+}
+
 function AuthPage() {
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
@@ -35,7 +46,6 @@ function AuthPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const captchaRef = useRef<CaptchaHandle>(null);
   const { signIn, signUp, resetPassword, user } = useAuth();
@@ -54,21 +64,17 @@ function AuthPage() {
     setMode(next);
     setError("");
     setSuccess("");
-    setPasswordErrors([]);
     resetCaptcha();
   }, [resetCaptcha]);
 
-  // Redirect inside effect to avoid setState during render warnings
   useEffect(() => {
     if (user) navigate({ to: "/" });
   }, [user, navigate]);
 
   if (user) return null;
 
-  const validatePassword = (pwd: string) => {
-    const result = passwordSchema.safeParse(pwd);
-    setPasswordErrors(result.success ? [] : result.error.errors.map(e => e.message));
-  };
+  const passwordChecks = computePasswordChecks(password);
+  const passwordStrength = passwordChecks.filter(c => c.ok).length;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,16 +127,22 @@ function AuthPage() {
       hadError = true;
     } finally {
       setLoading(false);
-      // Regenerate captcha on every failed attempt for extra security
       if (hadError) resetCaptcha();
     }
   };
 
+  const titles: Record<Mode, { title: string; subtitle: string }> = {
+    login: { title: "Bienvenido de vuelta", subtitle: "Inicia sesión para continuar 🌻" },
+    signup: { title: "Crea tu cuenta", subtitle: "Únete a Florería Girasoles" },
+    forgot: { title: "Recupera tu cuenta", subtitle: "Te enviaremos un enlace por email" },
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="absolute inset-0 dots-pattern opacity-20" />
-      <div className="absolute top-10 right-10 w-96 h-96 bg-primary/8 rounded-full blur-[100px]" />
-      <div className="absolute bottom-10 left-10 w-80 h-80 bg-accent/8 rounded-full blur-[100px]" />
+    <div className="min-h-[100dvh] flex items-center justify-center px-4 py-8 sm:py-12 relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Decorative background */}
+      <div aria-hidden className="absolute inset-0 dots-pattern opacity-20" />
+      <div aria-hidden className="absolute -top-20 -right-20 w-[28rem] h-[28rem] bg-primary/10 rounded-full blur-[100px]" />
+      <div aria-hidden className="absolute -bottom-20 -left-20 w-[24rem] h-[24rem] bg-accent/10 rounded-full blur-[100px]" />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -138,158 +150,265 @@ function AuthPage() {
         transition={{ duration: 0.4 }}
         className="w-full max-w-md relative z-10"
       >
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2.5 group">
-            <div className="h-11 w-11 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <Flower2 className="h-5 w-5 text-primary" />
+        {/* Brand header */}
+        <div className="text-center mb-6 sm:mb-8">
+          <Link to="/" className="inline-flex items-center gap-2.5 group" aria-label="Volver al inicio">
+            <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-105 transition-all">
+              <Flower2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
-            <span className="font-heading text-2xl sm:text-3xl font-bold text-foreground">
+            <span className="font-heading text-xl sm:text-2xl font-bold text-foreground">
               Florería <span className="text-primary">Girasoles</span>
             </span>
           </Link>
-          <p className="text-muted-foreground mt-3 text-sm">
-            {isLogin && "Bienvenido de vuelta 🌻"}
-            {isSignup && "Crea tu cuenta para empezar"}
-            {isForgot && "Te enviaremos un enlace para recuperarla"}
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={mode}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2 }}
+              className="mt-4 sm:mt-5"
+            >
+              <h1 className="font-heading text-xl sm:text-2xl font-bold text-foreground">
+                {titles[mode].title}
+              </h1>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {titles[mode].subtitle}
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        <div className="bg-card/80 backdrop-blur-sm rounded-2xl shadow-xl border border-border/40 p-6 sm:p-8">
+        {/* Card */}
+        <div className="bg-card/90 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-xl border border-border/50 p-5 sm:p-7">
+          {/* Tabs (only login/signup) */}
+          {!isForgot && (
+            <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-muted/60 mb-5">
+              <button
+                type="button"
+                onClick={() => switchMode("login")}
+                className={`py-2 text-sm font-medium rounded-lg transition-all ${
+                  isLogin ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Iniciar sesión
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMode("signup")}
+                className={`py-2 text-sm font-medium rounded-lg transition-all ${
+                  isSignup ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Crear cuenta
+              </button>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            {isSignup && (
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Nombre completo</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Tu nombre"
-                    maxLength={100}
-                    autoComplete="name"
-                    required
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
-                  />
-                </div>
-              </div>
-            )}
+            <AnimatePresence initial={false}>
+              {isSignup && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <FieldLabel>Nombre completo</FieldLabel>
+                  <InputWrap icon={<User className="h-4 w-4" />}>
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Tu nombre"
+                      maxLength={100}
+                      autoComplete="name"
+                      required
+                      className="auth-input"
+                    />
+                  </InputWrap>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <FieldLabel>Email</FieldLabel>
+              <InputWrap icon={<Mail className="h-4 w-4" />}>
                 <input
                   type="email"
+                  inputMode="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@email.com"
                   maxLength={255}
                   autoComplete="email"
                   required
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
+                  className="auth-input"
                 />
-              </div>
+              </InputWrap>
             </div>
 
-            {!isForgot && (
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Contraseña</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (isSignup) validatePassword(e.target.value);
-                    }}
-                    placeholder="••••••••"
-                    maxLength={128}
-                    autoComplete={isLogin ? "current-password" : "new-password"}
-                    required
-                    className="w-full pl-10 pr-12 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-
-                {isSignup && password.length > 0 && passwordErrors.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {passwordErrors.map((err, i) => (
-                      <p key={i} className="text-xs text-destructive flex items-center gap-1">
-                        <AlertTriangle className="h-3 w-3 flex-shrink-0" /> {err}
-                      </p>
-                    ))}
+            <AnimatePresence initial={false}>
+              {!isForgot && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <FieldLabel className="!mb-0">Contraseña</FieldLabel>
+                    {isLogin && (
+                      <button
+                        type="button"
+                        onClick={() => switchMode("forgot")}
+                        className="text-xs text-primary hover:underline font-medium"
+                      >
+                        ¿Olvidaste tu contraseña?
+                      </button>
+                    )}
                   </div>
-                )}
-
-                {isLogin && (
-                  <div className="mt-2 text-right">
+                  <InputWrap icon={<Lock className="h-4 w-4" />}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      maxLength={128}
+                      autoComplete={isLogin ? "current-password" : "new-password"}
+                      required
+                      className="auth-input pr-10"
+                    />
                     <button
                       type="button"
-                      onClick={() => switchMode("forgot")}
-                      className="text-xs text-primary hover:underline"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                      aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                     >
-                      ¿Olvidaste tu contraseña?
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
-                  </div>
-                )}
-              </div>
-            )}
+                  </InputWrap>
+
+                  {isSignup && password.length > 0 && (
+                    <div className="mt-2.5">
+                      {/* Strength bar */}
+                      <div className="flex gap-1 mb-2">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <div
+                            key={i}
+                            className={`h-1 flex-1 rounded-full transition-colors ${
+                              i <= passwordStrength
+                                ? passwordStrength <= 2
+                                  ? "bg-destructive"
+                                  : passwordStrength <= 3
+                                  ? "bg-warning"
+                                  : "bg-success"
+                                : "bg-muted"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                        {passwordChecks.map((c) => (
+                          <p
+                            key={c.label}
+                            className={`text-[11px] flex items-center gap-1 ${
+                              c.ok ? "text-success" : "text-muted-foreground"
+                            }`}
+                          >
+                            <CheckCircle2
+                              className={`h-3 w-3 flex-shrink-0 ${c.ok ? "opacity-100" : "opacity-40"}`}
+                            />
+                            {c.label}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <CaptchaChallenge ref={captchaRef} onVerified={setCaptchaVerified} />
 
-            {error && (
-              <div className="bg-destructive/10 text-destructive rounded-lg px-3 py-2 text-sm flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="bg-success/10 text-success rounded-lg px-3 py-2 text-sm">
-                {success}
-              </div>
-            )}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="bg-destructive/10 border border-destructive/20 text-destructive rounded-xl px-3 py-2.5 text-sm flex items-start gap-2"
+                  role="alert"
+                >
+                  <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </motion.div>
+              )}
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="bg-success/10 border border-success/20 text-success rounded-xl px-3 py-2.5 text-sm flex items-start gap-2"
+                  role="status"
+                >
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                  <span>{success}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <button
               type="submit"
               disabled={loading || !captchaVerified}
-              className="w-full btn-primary py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn-primary py-3.5 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
             >
-              {loading ? "Procesando..." : isLogin ? "Iniciar Sesión" : isForgot ? "Enviar enlace" : "Crear Cuenta"}
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Procesando...
+                </>
+              ) : isLogin ? (
+                "Iniciar Sesión"
+              ) : isForgot ? (
+                "Enviar enlace"
+              ) : (
+                "Crear Cuenta"
+              )}
             </button>
           </form>
 
-          <div className="mt-6 text-center space-y-2">
-            {isForgot ? (
-              <button
-                onClick={() => switchMode("login")}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                ← Volver a iniciar sesión
-              </button>
-            ) : (
-              <button
-                onClick={() => switchMode(isLogin ? "signup" : "login")}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
-              </button>
-            )}
-          </div>
+          {isForgot && (
+            <button
+              onClick={() => switchMode("login")}
+              className="mt-5 w-full inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Volver a iniciar sesión
+            </button>
+          )}
         </div>
+
+        <p className="text-center text-xs text-muted-foreground mt-5 px-4">
+          Al continuar aceptas nuestros términos y la política de privacidad.
+        </p>
       </motion.div>
     </div>
   );
 }
+
+const FieldLabel = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+  <label className={`block text-sm font-medium text-foreground mb-1.5 ${className}`}>{children}</label>
+);
+
+const InputWrap = ({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) => (
+  <div className="relative">
+    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+      {icon}
+    </span>
+    {children}
+  </div>
+);
 
 function translateAuthError(error: string): string {
   if (error.includes("Invalid login credentials")) return "Email o contraseña incorrectos";
