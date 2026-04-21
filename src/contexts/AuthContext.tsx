@@ -39,20 +39,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const checkAdminRole = useCallback(async (userId: string) => {
+    // Cache admin role per user_id in sessionStorage to avoid re-querying on
+    // every auth state change (e.g. tab focus, token refresh).
     try {
+      const cacheKey = `admin_role:${userId}`;
+      const cached = typeof sessionStorage !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
+      if (cached !== null) {
+        setIsAdmin(cached === "1");
+        return;
+      }
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId)
         .eq("role", "admin")
         .maybeSingle();
-      
+
       if (error) {
         console.error("Error checking admin role:", error);
         setIsAdmin(false);
         return;
       }
-      setIsAdmin(!!data);
+      const isAdminUser = !!data;
+      setIsAdmin(isAdminUser);
+      if (typeof sessionStorage !== "undefined") {
+        sessionStorage.setItem(cacheKey, isAdminUser ? "1" : "0");
+      }
     } catch {
       setIsAdmin(false);
     }
