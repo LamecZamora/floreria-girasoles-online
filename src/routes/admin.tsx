@@ -26,6 +26,8 @@ function AdminPage() {
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [productCount, setProductCount] = useState<number>(0);
+  const [pendingCount, setPendingCount] = useState<number>(0);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -36,8 +38,18 @@ function AdminPage() {
   useEffect(() => {
     if (isAdmin) {
       loadUsers();
+      loadCounts();
     }
   }, [isAdmin]);
+
+  const loadCounts = async () => {
+    const [{ count: pCount }, { count: oCount }] = await Promise.all([
+      supabase.from("products").select("*", { count: "exact", head: true }),
+      supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "pendiente"),
+    ]);
+    setProductCount(pCount || 0);
+    setPendingCount(oCount || 0);
+  };
 
   const loadUsers = async () => {
     setLoadingUsers(true);
