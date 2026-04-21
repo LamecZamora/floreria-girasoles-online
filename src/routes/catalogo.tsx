@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { type Category } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import { Search, X, Loader2 } from "lucide-react";
+
+const PAGE_SIZE = 24;
 
 export const Route = createFileRoute("/catalogo")({
   component: CatalogoPage,
