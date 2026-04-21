@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { Shield, Users, Package, LogOut, AlertTriangle, ClipboardList, ArrowRight } from "lucide-react";
+import { Shield, Users, Package, LogOut, AlertTriangle, ClipboardList, ArrowRight, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 
@@ -22,7 +22,7 @@ interface UserProfile {
 }
 
 function AdminPage() {
-  const { user, isAdmin, loading, signOut } = useAuth();
+  const { user, isAdmin, mfaVerified, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
@@ -121,6 +121,23 @@ function AdminPage() {
             <LogOut className="h-4 w-4" /> Cerrar sesión
           </button>
         </div>
+
+        {/* 2FA reminder for admins */}
+        {!mfaVerified && (
+          <Link
+            to="/seguridad"
+            className="group flex items-start gap-3 bg-accent/10 border border-accent/30 rounded-2xl p-4 mb-6 hover:bg-accent/15 transition-all"
+          >
+            <div className="p-2 rounded-xl bg-accent/20 text-accent flex-shrink-0">
+              <ShieldAlert className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-foreground text-sm sm:text-base">Activa 2FA — obligatorio para administradores</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Protege tu cuenta con Google Authenticator. Toca aquí para configurarlo.</p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-accent group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+          </Link>
+        )}
 
         {/* Quick actions */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
