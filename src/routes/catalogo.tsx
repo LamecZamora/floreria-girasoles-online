@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { mockProducts, type Category } from "@/data/products";
+import { type Category } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/CategoryFilter";
-import { Search, X } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/catalogo")({
   component: CatalogoPage,
@@ -21,9 +22,10 @@ function CatalogoPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | "all">("all");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc">("default");
+  const { products, loading } = useProducts();
 
   const filtered = useMemo(() => {
-    let results = mockProducts.filter((p) => {
+    let results = products.filter((p) => {
       const matchCategory = selectedCategory === "all" || p.category === selectedCategory;
       const term = search.toLowerCase();
       const matchSearch = p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term);
@@ -32,14 +34,14 @@ function CatalogoPage() {
     if (sortBy === "price-asc") results = [...results].sort((a, b) => a.price - b.price);
     if (sortBy === "price-desc") results = [...results].sort((a, b) => b.price - a.price);
     return results;
-  }, [selectedCategory, search, sortBy]);
+  }, [products, selectedCategory, search, sortBy]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14">
       <div className="text-center mb-10 sm:mb-14">
         <h1 className="section-heading text-3xl sm:text-4xl md:text-5xl mb-3">Catálogo Completo</h1>
         <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
-          Explora nuestra colección de {mockProducts.length} arreglos florales artesanales.
+          Explora nuestra colección de {products.length} arreglos florales artesanales.
         </p>
       </div>
 
@@ -81,7 +83,11 @@ function CatalogoPage() {
         <CategoryFilter selected={selectedCategory} onSelect={setSelectedCategory} />
       </div>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-20">
           <div className="h-20 w-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
             <Search className="h-8 w-8 text-muted-foreground/40" />
