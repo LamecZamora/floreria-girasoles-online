@@ -53,11 +53,11 @@ interface Order {
 }
 
 const STATUS_CONFIG: Record<string, { icon: typeof Clock; label: string; color: string }> = {
-  pendiente: { icon: Clock, label: "Pendiente", color: "text-yellow-600 bg-yellow-500/10" },
-  confirmado: { icon: CheckCircle, label: "Confirmado", color: "text-blue-600 bg-blue-500/10" },
-  enviado: { icon: Truck, label: "Enviado", color: "text-purple-600 bg-purple-500/10" },
-  entregado: { icon: CheckCircle, label: "Entregado", color: "text-green-600 bg-green-500/10" },
-  cancelado: { icon: XCircle, label: "Cancelado", color: "text-red-600 bg-red-500/10" },
+  pendiente: { icon: Clock, label: "Pendiente", color: "text-warning bg-warning/10" },
+  confirmado: { icon: CheckCircle, label: "Confirmado", color: "text-info bg-info/10" },
+  enviado: { icon: Truck, label: "Enviado", color: "text-primary bg-primary/10" },
+  entregado: { icon: CheckCircle, label: "Entregado", color: "text-success bg-success/10" },
+  cancelado: { icon: XCircle, label: "Cancelado", color: "text-destructive bg-destructive/10" },
 };
 
 function PedidosPage() {
