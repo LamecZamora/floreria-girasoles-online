@@ -194,7 +194,7 @@ function SecurityPage() {
           </div>
         )}
         {success && (
-          <div className="bg-green-500/10 text-green-700 dark:text-green-400 rounded-xl px-4 py-3 mb-4 text-sm flex items-center gap-2">
+          <div className="bg-secondary/10 text-secondary rounded-xl px-4 py-3 mb-4 text-sm flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 flex-shrink-0" /> {success}
           </div>
         )}
@@ -214,7 +214,7 @@ function SecurityPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-5 items-center">
-              <div className="bg-white p-3 rounded-xl border-2 border-primary/20 flex-shrink-0">
+              <div className="bg-background p-3 rounded-xl border-2 border-primary/20 flex-shrink-0 ring-1 ring-foreground/5">
                 <img src={enrollData.qr} alt="Código QR para 2FA" className="h-44 w-44 sm:h-52 sm:w-52" />
               </div>
               <div className="flex-1 w-full space-y-3">

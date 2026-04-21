@@ -7,8 +7,10 @@ interface AuthContextType {
   session: Session | null;
   isAdmin: boolean;
   loading: boolean;
+  mfaRequired: boolean;
+  mfaVerified: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: string | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: string | null; mfaRequired?: boolean }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   updatePassword: (password: string) => Promise<{ error: string | null }>;
@@ -21,6 +23,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaVerified, setMfaVerified] = useState(false);
+
+  const checkMfaStatus = useCallback(async () => {
+    try {
+      const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      const required = data?.nextLevel === "aal2" && data?.currentLevel !== "aal2";
+      setMfaRequired(required);
+      setMfaVerified(data?.currentLevel === "aal2");
+    } catch {
+      setMfaRequired(false);
+      setMfaVerified(false);
+    }
+  }, []);
 
   const checkAdminRole = useCallback(async (userId: string) => {
     try {
