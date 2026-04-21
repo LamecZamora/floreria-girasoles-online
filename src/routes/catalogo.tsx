@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { type Category } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import { Search, X, Loader2 } from "lucide-react";
+
+const PAGE_SIZE = 24;
 
 export const Route = createFileRoute("/catalogo")({
   component: CatalogoPage,
@@ -22,19 +24,44 @@ function CatalogoPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | "all">("all");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc">("default");
+  const [visible, setVisible] = useState(PAGE_SIZE);
   const { products, loading } = useProducts();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setVisible(PAGE_SIZE);
+  }, [selectedCategory, search, sortBy]);
 
   const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
     let results = products.filter((p) => {
       const matchCategory = selectedCategory === "all" || p.category === selectedCategory;
-      const term = search.toLowerCase();
-      const matchSearch = p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term);
-      return matchCategory && matchSearch;
+      if (!term) return matchCategory;
+      return matchCategory && (p.name.toLowerCase().includes(term) || p.description.toLowerCase().includes(term));
     });
     if (sortBy === "price-asc") results = [...results].sort((a, b) => a.price - b.price);
     if (sortBy === "price-desc") results = [...results].sort((a, b) => b.price - a.price);
     return results;
   }, [products, selectedCategory, search, sortBy]);
+
+  const visibleProducts = useMemo(() => filtered.slice(0, visible), [filtered, visible]);
+  const hasMore = visible < filtered.length;
+
+  useEffect(() => {
+    if (!hasMore) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisible((v) => Math.min(v + PAGE_SIZE, filtered.length));
+        }
+      },
+      { rootMargin: "600px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, filtered.length]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14">
@@ -107,10 +134,15 @@ function CatalogoPage() {
             {filtered.length} producto{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
           </p>
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {filtered.map((product, i) => (
+            {visibleProducts.map((product, i) => (
               <ProductCard key={product.id} product={product} index={i} />
             ))}
           </div>
+          {hasMore && (
+            <div ref={sentinelRef} className="flex justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-primary/60" />
+            </div>
+          )}
         </>
       )}
     </div>
