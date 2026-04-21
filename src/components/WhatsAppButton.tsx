@@ -2,7 +2,8 @@ import { MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 const WHATSAPP_NUMBER = "526181169706";
-const MESSAGE = "¡Hola! Me interesa un arreglo floral 🌻";
+const MESSAGE =
+  "¡Hola! Me interesa un arreglo floral 🌻\n\nSé que los pedidos requieren 10 días de anticipación. Mi consulta es:";
 
 const WhatsAppButton = () => {
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(MESSAGE)}`;
