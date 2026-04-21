@@ -3,27 +3,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { mockProducts, type Product, type Category } from "@/data/products";
 
 // Map of legacy local image paths -> imported asset modules.
-// Products migrated from src/data/products.ts use paths like
-// "/src/assets/products/foo.jpg" — Vite cannot serve those at runtime,
-// so we resolve them to the bundled URL via the mock dataset.
 const localImageMap = new Map<string, string>(
   mockProducts.map((p) => [`/src/assets/products/${imageBasename(p.image)}`, p.image])
 );
 
 function imageBasename(src: string): string {
-  // Vite-imported assets resolve to URLs like /assets/foo-abc123.jpg or
-  // base64; for our mock products they are .jpg filenames. Extract the
-  // basename without hash suffix to use as lookup key.
   const url = src.split("/").pop() || src;
-  // Strip Vite hash suffix: name-HASH.jpg -> name.jpg
   return url.replace(/-[A-Za-z0-9_]{6,}\.(jpg|jpeg|png|webp|svg)$/i, ".$1");
 }
 
 export function resolveProductImage(image: string): string {
   if (!image) return "";
-  // Already a full URL (Storage / CDN)
   if (/^https?:\/\//i.test(image)) return image;
-  // Local migrated path -> bundled URL
   const mapped = localImageMap.get(image);
   if (mapped) return mapped;
   return image;
@@ -52,60 +43,163 @@ export function dbToProduct(p: DbProduct): Product {
   };
 }
 
+// ---------- Module-level cache ----------
+// Shared across all consumers so navigating between routes is instant.
+const STALE_MS = 5 * 60_000; // 5 minutes
+type CacheEntry = { data: Product[]; ts: number };
+let publicCache: CacheEntry | null = null;
+let publicInflight: Promise<Product[]> | null = null;
+const publicSubscribers = new Set<(p: Product[]) => void>();
+
+let adminCache: { data: DbProduct[]; ts: number } | null = null;
+let adminInflight: Promise<DbProduct[]> | null = null;
+const adminSubscribers = new Set<(p: DbProduct[]) => void>();
+
+async function fetchPublicProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("active", true)
+    .order("category", { ascending: true })
+    .order("id", { ascending: true })
+    .limit(1000);
+
+  if (error) {
+    console.error("Error loading products:", error);
+    return mockProducts;
+  }
+  if (!data || data.length === 0) return mockProducts;
+  return data.map(dbToProduct);
+}
+
+async function loadPublic(force = false): Promise<Product[]> {
+  if (!force && publicCache && Date.now() - publicCache.ts < STALE_MS) {
+    return publicCache.data;
+  }
+  if (publicInflight) return publicInflight;
+  publicInflight = fetchPublicProducts()
+    .then((products) => {
+      publicCache = { data: products, ts: Date.now() };
+      publicSubscribers.forEach((cb) => cb(products));
+      return products;
+    })
+    .finally(() => {
+      publicInflight = null;
+    });
+  return publicInflight;
+}
+
 export function useProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>(() => publicCache?.data ?? []);
+  const [loading, setLoading] = useState(() => !publicCache);
   const [error, setError] = useState<string | null>(null);
 
   const refetch = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("active", true)
-      .order("category", { ascending: true })
-      .order("id", { ascending: true })
-      .limit(1000);
-
-    if (error) {
-      console.error("Error loading products:", error);
-      setError(error.message);
-      // Fallback to mock data so the catalogue is never empty
-      setProducts(mockProducts);
-    } else if (data && data.length > 0) {
-      setProducts(data.map(dbToProduct));
-    } else {
-      setProducts(mockProducts);
+    try {
+      const data = await loadPublic(true);
+      setProducts(data);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    let mounted = true;
+    const sub = (data: Product[]) => { if (mounted) setProducts(data); };
+    publicSubscribers.add(sub);
+
+    if (publicCache && Date.now() - publicCache.ts < STALE_MS) {
+      // Fresh cache — instant render
+      setProducts(publicCache.data);
+      setLoading(false);
+    } else {
+      loadPublic().then((data) => {
+        if (mounted) {
+          setProducts(data);
+          setLoading(false);
+        }
+      });
+    }
+
+    return () => {
+      mounted = false;
+      publicSubscribers.delete(sub);
+    };
+  }, []);
 
   return { products, loading, error, refetch };
 }
 
+async function fetchAdminProducts(): Promise<DbProduct[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(1000);
+  if (error || !data) return [];
+  return data as DbProduct[];
+}
+
+async function loadAdmin(force = false): Promise<DbProduct[]> {
+  if (!force && adminCache && Date.now() - adminCache.ts < STALE_MS) {
+    return adminCache.data;
+  }
+  if (adminInflight) return adminInflight;
+  adminInflight = fetchAdminProducts()
+    .then((products) => {
+      adminCache = { data: products, ts: Date.now() };
+      adminSubscribers.forEach((cb) => cb(products));
+      return products;
+    })
+    .finally(() => {
+      adminInflight = null;
+    });
+  return adminInflight;
+}
+
 export function useAllProductsAdmin() {
-  const [products, setProducts] = useState<DbProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<DbProduct[]>(() => adminCache?.data ?? []);
+  const [loading, setLoading] = useState(() => !adminCache);
 
   const refetch = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(1000);
-    if (!error && data) setProducts(data as DbProduct[]);
-    setLoading(false);
+    try {
+      // Force refetch + invalidate public cache (admin edits affect catalog too)
+      const data = await loadAdmin(true);
+      publicCache = null;
+      loadPublic(true);
+      setProducts(data);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    let mounted = true;
+    const sub = (data: DbProduct[]) => { if (mounted) setProducts(data); };
+    adminSubscribers.add(sub);
+
+    if (adminCache && Date.now() - adminCache.ts < STALE_MS) {
+      setProducts(adminCache.data);
+      setLoading(false);
+    } else {
+      loadAdmin().then((data) => {
+        if (mounted) {
+          setProducts(data);
+          setLoading(false);
+        }
+      });
+    }
+
+    return () => {
+      mounted = false;
+      adminSubscribers.delete(sub);
+    };
+  }, []);
 
   return { products, loading, refetch };
 }
