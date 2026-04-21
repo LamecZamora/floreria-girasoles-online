@@ -131,9 +131,9 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", damping: 12 }}
-                  className="h-20 w-20 rounded-full bg-green-500/10 flex items-center justify-center"
+                  className="h-20 w-20 rounded-full bg-success/10 flex items-center justify-center"
                 >
-                  <CheckCircle2 className="h-12 w-12 text-green-600" />
+                  <CheckCircle2 className="h-12 w-12 text-success" />
                 </motion.div>
                 <h3 className="font-heading text-2xl font-bold text-foreground">¡Pedido confirmado!</h3>
                 <p className="text-muted-foreground text-sm">Te llevamos a tus pedidos…</p>
