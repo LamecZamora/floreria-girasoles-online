@@ -134,10 +134,15 @@ function CatalogoPage() {
             {filtered.length} producto{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
           </p>
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {filtered.map((product, i) => (
+            {visibleProducts.map((product, i) => (
               <ProductCard key={product.id} product={product} index={i} />
             ))}
           </div>
+          {hasMore && (
+            <div ref={sentinelRef} className="flex justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-primary/60" />
+            </div>
+          )}
         </>
       )}
     </div>
