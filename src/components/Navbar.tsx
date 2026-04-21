@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { ShoppingCart, Menu, X, User, LogOut, Settings, ClipboardList } from "lucide-react";
+import { ShoppingCart, Menu, X, User, LogOut, Settings, ClipboardList, ShieldCheck, ShieldAlert } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
@@ -8,7 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
   const { itemCount, setIsOpen } = useCart();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, mfaVerified, signOut } = useAuth();
+  const needs2FA = isAdmin && !mfaVerified;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -57,6 +58,15 @@ const Navbar = () => {
           <NavItem to="/catalogo" label="Catálogo" active={location.pathname === "/catalogo"} />
           {user && (
             <NavItem to="/pedidos" label="Pedidos" active={location.pathname === "/pedidos"} icon={<ClipboardList className="h-3.5 w-3.5" />} />
+          )}
+          {user && (
+            <NavItem
+              to="/seguridad"
+              label="Seguridad"
+              active={location.pathname === "/seguridad"}
+              icon={needs2FA ? <ShieldAlert className="h-3.5 w-3.5 text-accent" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+              alert={needs2FA}
+            />
           )}
           {isAdmin && (
             <NavItem to="/admin" label="Admin" active={location.pathname === "/admin"} icon={<Settings className="h-3.5 w-3.5" />} />
@@ -125,6 +135,11 @@ const Navbar = () => {
                 {user && (
                   <MobileLink to="/pedidos" onClick={() => setMobileOpen(false)} icon="📋" active={location.pathname === "/pedidos"}>Mis Pedidos</MobileLink>
                 )}
+                {user && (
+                  <MobileLink to="/seguridad" onClick={() => setMobileOpen(false)} icon={needs2FA ? "🛡️" : "🔒"} active={location.pathname === "/seguridad"}>
+                    Seguridad {needs2FA && <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-accent/20 text-accent">!</span>}
+                  </MobileLink>
+                )}
                 {isAdmin && (
                   <MobileLink to="/admin" onClick={() => setMobileOpen(false)} icon="⚙️" active={location.pathname === "/admin"}>Panel Admin</MobileLink>
                 )}
@@ -159,10 +174,10 @@ const Navbar = () => {
   );
 };
 
-const NavItem = ({ to, label, active, icon }: { to: string; label: string; active: boolean; icon?: React.ReactNode }) => (
+const NavItem = ({ to, label, active, icon, alert }: { to: string; label: string; active: boolean; icon?: React.ReactNode; alert?: boolean }) => (
   <Link
     to={to}
-    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
+    className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
       active
         ? "bg-primary/10 text-primary"
         : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -170,6 +185,9 @@ const NavItem = ({ to, label, active, icon }: { to: string; label: string; activ
   >
     {icon}
     {label}
+    {alert && (
+      <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-accent ring-2 ring-card animate-pulse" />
+    )}
   </Link>
 );
 
@@ -182,7 +200,7 @@ const MobileLink = ({ to, onClick, icon, children, active }: { to: string; onCli
     }`}
   >
     <span className="text-xl">{icon}</span>
-    {children}
+    <span className="flex items-center gap-2 flex-1">{children}</span>
   </Link>
 );
 

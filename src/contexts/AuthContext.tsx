@@ -7,8 +7,10 @@ interface AuthContextType {
   session: Session | null;
   isAdmin: boolean;
   loading: boolean;
+  mfaRequired: boolean;
+  mfaVerified: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: string | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: string | null; mfaRequired?: boolean }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
   updatePassword: (password: string) => Promise<{ error: string | null }>;
@@ -21,6 +23,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaVerified, setMfaVerified] = useState(false);
+
+  const checkMfaStatus = useCallback(async () => {
+    try {
+      const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      const required = data?.nextLevel === "aal2" && data?.currentLevel !== "aal2";
+      setMfaRequired(required);
+      setMfaVerified(data?.currentLevel === "aal2");
+    } catch {
+      setMfaRequired(false);
+      setMfaVerified(false);
+    }
+  }, []);
 
   const checkAdminRole = useCallback(async (userId: string) => {
     try {
@@ -50,9 +66,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (session?.user) {
         // Use setTimeout to avoid Supabase deadlock
-        setTimeout(() => checkAdminRole(session.user.id), 0);
+        setTimeout(() => {
+          checkAdminRole(session.user.id);
+          checkMfaStatus();
+        }, 0);
       } else {
         setIsAdmin(false);
+        setMfaRequired(false);
+        setMfaVerified(false);
       }
       setLoading(false);
     });
@@ -63,12 +84,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       if (session?.user) {
         checkAdminRole(session.user.id);
+        checkMfaStatus();
       }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [checkAdminRole]);
+  }, [checkAdminRole, checkMfaStatus]);
 
   const signUp = useCallback(async (email: string, password: string, fullName: string) => {
     const { error } = await supabase.auth.signUp({
@@ -84,7 +106,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    if (error) return { error: error.message };
+    // Check if MFA is required after successful password auth
+    try {
+      const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      const required = data?.nextLevel === "aal2" && data?.currentLevel !== "aal2";
+      return { error: null, mfaRequired: required };
+    } catch {
+      return { error: null, mfaRequired: false };
+    }
   }, []);
 
   const signOut = useCallback(async () => {
@@ -92,6 +122,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setSession(null);
     setIsAdmin(false);
+    setMfaRequired(false);
+    setMfaVerified(false);
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
@@ -107,7 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, resetPassword, updatePassword }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, mfaRequired, mfaVerified, signUp, signIn, signOut, resetPassword, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );

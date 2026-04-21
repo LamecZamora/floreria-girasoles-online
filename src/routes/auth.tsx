@@ -91,8 +91,9 @@ function AuthPage() {
       }
 
       if (isLogin) {
-        const { error } = await signIn(email.trim(), password);
+        const { error, mfaRequired } = await signIn(email.trim(), password);
         if (error) { setError(translateAuthError(error)); hadError = true; }
+        else if (mfaRequired) navigate({ to: "/auth/mfa" });
         else navigate({ to: "/" });
       } else if (isForgot) {
         const { error } = await resetPassword(email.trim());
