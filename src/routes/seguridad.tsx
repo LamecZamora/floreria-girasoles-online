@@ -157,7 +157,20 @@ function SecurityPage() {
     );
   }
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+            <Shield className="h-7 w-7 text-primary" />
+          </div>
+          <h1 className="font-heading text-xl font-semibold text-foreground">Inicia sesión</h1>
+          <p className="text-sm text-muted-foreground mt-2">Necesitas una cuenta para gestionar tu seguridad.</p>
+          <Link to="/auth" className="btn-primary mt-5 inline-flex">Iniciar sesión</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
