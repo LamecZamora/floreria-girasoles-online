@@ -1,4 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
@@ -8,6 +9,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import OrderNotifications from "@/components/OrderNotifications";
 import MfaGuard from "@/components/MfaGuard";
 import { Toaster } from "@/components/ui/sonner";
+import { prefetchProducts } from "@/hooks/useProducts";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -71,6 +73,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  useEffect(() => {
+    // Kick off product fetch in parallel with the initial render so the
+    // catalog/home are essentially instant once components mount.
+    prefetchProducts();
+  }, []);
+
   return (
     <AuthProvider>
       <CartProvider>

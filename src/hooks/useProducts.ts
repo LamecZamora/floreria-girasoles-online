@@ -89,6 +89,13 @@ async function loadPublic(force = false): Promise<Product[]> {
   return publicInflight;
 }
 
+/** Public helper: trigger a background fetch (used by root to warm the cache). */
+export function prefetchProducts() {
+  if (typeof window === "undefined") return;
+  if (publicCache && Date.now() - publicCache.ts < STALE_MS) return;
+  void loadPublic();
+}
+
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>(() => publicCache?.data ?? []);
   const [loading, setLoading] = useState(() => !publicCache);
