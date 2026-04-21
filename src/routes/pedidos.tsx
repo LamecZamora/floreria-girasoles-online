@@ -75,6 +75,24 @@ function PedidosPage() {
       return;
     }
     fetchOrders();
+
+    // Suscripción en tiempo real: nuevos pedidos y cambios de estado aparecen sin recargar
+    supabase.realtime.setAuth();
+    const filter = isAdmin ? undefined : `user_id=eq.${user.id}`;
+    const channel = supabase
+      .channel(`orders:list:${user.id}`, { config: { private: true } })
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders", ...(filter ? { filter } : {}) },
+        () => {
+          fetchOrders();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, isAdmin]);
 
