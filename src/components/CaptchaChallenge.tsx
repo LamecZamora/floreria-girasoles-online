@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 import { RefreshCw, Check } from "lucide-react";
 
 function generateChallenge() {
@@ -27,11 +27,15 @@ function generateChallenge() {
   return { question: `${a} ${op} ${b}`, answer };
 }
 
+export interface CaptchaHandle {
+  refresh: () => void;
+}
+
 interface CaptchaChallengeProps {
   onVerified: (verified: boolean) => void;
 }
 
-const CaptchaChallenge = ({ onVerified }: CaptchaChallengeProps) => {
+const CaptchaChallenge = forwardRef<CaptchaHandle, CaptchaChallengeProps>(({ onVerified }, ref) => {
   const [challenge, setChallenge] = useState(generateChallenge);
   const [input, setInput] = useState("");
   const [verified, setVerified] = useState(false);
@@ -42,6 +46,8 @@ const CaptchaChallenge = ({ onVerified }: CaptchaChallengeProps) => {
     setVerified(false);
     onVerified(false);
   }, [onVerified]);
+
+  useImperativeHandle(ref, () => ({ refresh }), [refresh]);
 
   useEffect(() => {
     if (input === "") {
@@ -66,19 +72,30 @@ const CaptchaChallenge = ({ onVerified }: CaptchaChallengeProps) => {
         ? "border-green-500 bg-green-500/10"
         : "border-border bg-muted/30"
     }`}>
-      <div className="flex items-center gap-2 mb-2">
-        <div className={`h-5 w-5 rounded-full flex items-center justify-center transition-colors duration-300 ${
-          verified ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
-        }`}>
-          {verified ? <Check className="h-3 w-3" /> : <span className="text-[10px] font-bold">?</span>}
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className={`h-5 w-5 rounded-full flex items-center justify-center transition-colors duration-300 flex-shrink-0 ${
+            verified ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
+          }`}>
+            {verified ? <Check className="h-3 w-3" /> : <span className="text-[10px] font-bold">?</span>}
+          </div>
+          <span className={`text-xs font-medium transition-colors truncate ${verified ? "text-green-600" : "text-muted-foreground"}`}>
+            {verified ? "Verificado" : "Resuelve para continuar"}
+          </span>
         </div>
-        <span className={`text-xs font-medium transition-colors ${verified ? "text-green-600" : "text-muted-foreground"}`}>
-          {verified ? "Verificado" : "Resuelve para continuar"}
-        </span>
+        <button
+          type="button"
+          onClick={refresh}
+          className="p-1.5 rounded-lg hover:bg-muted transition-colors flex-shrink-0"
+          aria-label="Nueva operación"
+          title="Cambiar operación"
+        >
+          <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
+        </button>
       </div>
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 bg-card rounded-lg px-3 py-2 border border-border/50 select-none">
-          <span className="font-mono text-lg font-bold text-foreground tracking-wider">{challenge.question}</span>
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-card rounded-lg px-2.5 sm:px-3 py-2 border border-border/50 select-none flex-1 min-w-0 justify-center">
+          <span className="font-mono text-base sm:text-lg font-bold text-foreground tracking-wider">{challenge.question}</span>
           <span className="text-muted-foreground font-bold">=</span>
         </div>
         <input
@@ -89,25 +106,18 @@ const CaptchaChallenge = ({ onVerified }: CaptchaChallengeProps) => {
           onChange={(e) => setInput(e.target.value.replace(/[^0-9-]/g, ""))}
           placeholder="?"
           disabled={verified}
-          className={`w-20 text-center font-mono text-lg font-bold py-2 rounded-lg border transition-all focus:outline-none focus:ring-2 ${
+          className={`w-16 sm:w-20 text-center font-mono text-base sm:text-lg font-bold py-2 rounded-lg border transition-all focus:outline-none focus:ring-2 ${
             verified
               ? "border-green-500 bg-green-500/10 text-green-700 cursor-not-allowed"
               : "border-border bg-background text-foreground focus:ring-primary/50"
           }`}
           aria-label="Respuesta del captcha"
         />
-        <button
-          type="button"
-          onClick={refresh}
-          className="p-2 rounded-lg hover:bg-muted transition-colors"
-          aria-label="Nueva operación"
-          title="Cambiar operación"
-        >
-          <RefreshCw className="h-4 w-4 text-muted-foreground" />
-        </button>
       </div>
     </div>
   );
-};
+});
+
+CaptchaChallenge.displayName = "CaptchaChallenge";
 
 export default CaptchaChallenge;

@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { mockProducts, type Category } from "@/data/products";
+import { useState, useMemo } from "react";
+import { type Category } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import HeroSection from "@/components/HeroSection";
-import { Sparkles, ArrowRight, Truck, Shield, Heart } from "lucide-react";
+import { Sparkles, ArrowRight, Truck, Shield, Heart, Loader2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 
@@ -22,21 +23,23 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [selectedCategory, setSelectedCategory] = useState<Category | "all">("all");
+  const { products, loading } = useProducts();
 
-  const filtered =
-    selectedCategory === "all"
-      ? mockProducts.slice(0, 12)
-      : mockProducts.filter((p) => p.category === selectedCategory).slice(0, 12);
+  const filtered = useMemo(() => {
+    return selectedCategory === "all"
+      ? products.slice(0, 12)
+      : products.filter((p) => p.category === selectedCategory).slice(0, 12);
+  }, [products, selectedCategory]);
 
-  const featured = mockProducts.slice(0, 4);
+  const featured = useMemo(() => products.slice(0, 4), [products]);
 
   return (
     <div>
       <HeroSection />
 
       {/* Trust Badges */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-10 relative z-10">
-        <div className="grid grid-cols-3 gap-3 sm:gap-5 max-w-3xl mx-auto">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 relative z-10">
+        <div className="grid grid-cols-3 gap-2.5 sm:gap-5 max-w-3xl mx-auto">
           {[
             { icon: Truck, title: "Entrega Puntual", desc: "En todo Durango" },
             { icon: Shield, title: "Pago Seguro", desc: "100% protegido" },
@@ -48,72 +51,80 @@ function Index() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="glass-card p-4 sm:p-5 text-center"
+              className="glass-card p-3 sm:p-5 text-center"
             >
-              <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary mx-auto mb-2" />
-              <p className="font-medium text-foreground text-xs sm:text-sm">{title}</p>
-              <p className="text-muted-foreground text-[10px] sm:text-xs mt-0.5">{desc}</p>
+              <Icon className="h-4 w-4 sm:h-6 sm:w-6 text-primary mx-auto mb-1.5 sm:mb-2" />
+              <p className="font-medium text-foreground text-[11px] sm:text-sm leading-tight">{title}</p>
+              <p className="text-muted-foreground text-[9px] sm:text-xs mt-0.5 leading-tight hidden xs:block sm:block">{desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* Featured Products */}
-      <section id="destacados" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div className="text-center mb-10 sm:mb-14">
+      <section id="destacados" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-24">
+        <div className="text-center mb-8 sm:mb-14">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
             <div className="flex items-center justify-center gap-2 mb-3">
-              <div className="h-px w-8 bg-gold" />
-              <Sparkles className="h-4 w-4 text-gold" />
-              <span className="text-gold font-medium text-xs uppercase tracking-[0.25em]">Lo más vendido</span>
-              <Sparkles className="h-4 w-4 text-gold" />
-              <div className="h-px w-8 bg-gold" />
+              <div className="h-px w-6 sm:w-8 bg-primary/40" />
+              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+              <span className="text-primary font-medium text-[10px] sm:text-xs uppercase tracking-[0.25em]">Lo más vendido</span>
+              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+              <div className="h-px w-6 sm:w-8 bg-primary/40" />
             </div>
-            <h2 className="section-heading text-3xl sm:text-4xl md:text-5xl">Arreglos Destacados</h2>
-            <p className="text-muted-foreground mt-3 text-sm sm:text-base max-w-lg mx-auto">
+            <h2 className="section-heading text-2xl sm:text-4xl md:text-5xl">Arreglos Destacados</h2>
+            <p className="text-muted-foreground mt-3 text-sm sm:text-base max-w-lg mx-auto px-4">
               Nuestros clientes los eligen una y otra vez por su belleza y calidad
             </p>
           </motion.div>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {featured.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            {featured.map((product, i) => (
+              <ProductCard key={product.id} product={product} index={i} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Full Catalog Preview */}
-      <section className="relative py-16 sm:py-24 overflow-hidden">
+      <section className="relative py-12 sm:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/40 to-background" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-10 sm:mb-14"
+            className="text-center mb-8 sm:mb-14"
           >
-            <h2 className="section-heading text-3xl sm:text-4xl md:text-5xl mb-3">Nuestro Catálogo</h2>
-            <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
-              Encuentra el arreglo perfecto para cada ocasión. Filtra por categoría.
+            <h2 className="section-heading text-2xl sm:text-4xl md:text-5xl mb-3">Nuestro Catálogo</h2>
+            <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto px-4">
+              Encuentra el arreglo perfecto para cada ocasión.
             </p>
           </motion.div>
 
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <CategoryFilter selected={selectedCategory} onSelect={setSelectedCategory} />
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {filtered.map((product, i) => (
-              <ProductCard key={product.id} product={product} index={i} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+          ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+              {filtered.map((product, i) => (
+                <ProductCard key={product.id} product={product} index={i} />
+              ))}
+            </div>
+          )}
 
-          <div className="text-center mt-12 sm:mt-16">
-            <Link to="/catalogo" className="btn-primary text-base px-8 py-3.5">
+          <div className="text-center mt-10 sm:mt-16">
+            <Link to="/catalogo" className="btn-primary text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-3.5">
               Ver Catálogo Completo <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
