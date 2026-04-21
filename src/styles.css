@@ -320,6 +320,35 @@
   .safe-top {
     padding-top: max(0.75rem, env(safe-area-inset-top));
   }
+
+  /* Reusable input style for auth & forms — matches design tokens */
+  .auth-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  }
+  .auth-input::placeholder {
+    color: var(--color-muted-foreground);
+  }
+  .auth-input:hover {
+    border-color: oklch(0.78 0.16 80 / 0.5);
+  }
+  .auth-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px oklch(0.78 0.16 80 / 0.18);
+  }
+  /* Prevent iOS zoom on focus by ensuring 16px+ font size on small screens */
+  @media (max-width: 640px) {
+    .auth-input {
+      font-size: 16px;
+    }
+  }
 }
 
 @keyframes fadeInUp {
