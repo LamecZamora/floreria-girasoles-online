@@ -39,15 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const checkAdminRole = useCallback(async (userId: string) => {
-    // Cache admin role per user_id in sessionStorage to avoid re-querying on
-    // every auth state change (e.g. tab focus, token refresh).
     try {
-      const cacheKey = `admin_role:${userId}`;
-      const cached = typeof sessionStorage !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
-      if (cached !== null) {
-        setIsAdmin(cached === "1");
-        return;
-      }
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
@@ -62,9 +54,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       const isAdminUser = !!data;
       setIsAdmin(isAdminUser);
-      if (typeof sessionStorage !== "undefined") {
-        sessionStorage.setItem(cacheKey, isAdminUser ? "1" : "0");
-      }
     } catch {
       setIsAdmin(false);
     }
@@ -72,31 +61,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Set up auth listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        setLoading(true);
         // Use setTimeout to avoid Supabase deadlock
-        setTimeout(() => {
-          checkAdminRole(session.user.id);
-          checkMfaStatus();
+        setTimeout(async () => {
+          await Promise.all([checkAdminRole(session.user.id), checkMfaStatus()]);
+          setLoading(false);
         }, 0);
       } else {
         setIsAdmin(false);
         setMfaRequired(false);
         setMfaVerified(false);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     // THEN check initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdminRole(session.user.id);
-        checkMfaStatus();
+        await Promise.all([checkAdminRole(session.user.id), checkMfaStatus()]);
       }
       setLoading(false);
     });
@@ -130,12 +119,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signOut = useCallback(async () => {
-    if (typeof sessionStorage !== "undefined") {
-      // Clear cached admin-role flags
-      Object.keys(sessionStorage)
-        .filter((k) => k.startsWith("admin_role:"))
-        .forEach((k) => sessionStorage.removeItem(k));
-    }
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
