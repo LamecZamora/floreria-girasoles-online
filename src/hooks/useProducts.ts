@@ -3,13 +3,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { mockProducts, type Product, type Category } from "@/data/products";
 
 // Map of legacy local image paths -> imported asset modules.
-const localImageMap = new Map<string, string>(
-  mockProducts.map((p) => [`/src/assets/products/${imageBasename(p.image)}`, p.image])
-);
-
+// We register BOTH .jpg and .webp variants so DB rows that still reference
+// the old ".jpg" filename keep resolving to the new bundled WebP asset.
 function imageBasename(src: string): string {
   const url = src.split("/").pop() || src;
   return url.replace(/-[A-Za-z0-9_]{6,}\.(jpg|jpeg|png|webp|svg)$/i, ".$1");
+}
+
+const localImageMap = new Map<string, string>();
+for (const p of mockProducts) {
+  const base = imageBasename(p.image); // e.g. "ramo-rosas-rojas.webp"
+  const stem = base.replace(/\.(webp|jpg|jpeg|png|svg)$/i, "");
+  localImageMap.set(`/src/assets/products/${base}`, p.image);
+  localImageMap.set(`/src/assets/products/${stem}.jpg`, p.image);
+  localImageMap.set(`/src/assets/products/${stem}.webp`, p.image);
 }
 
 export function resolveProductImage(image: string): string {

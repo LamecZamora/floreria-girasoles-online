@@ -42,10 +42,12 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
         <img
           src={product.image}
           alt={product.name}
-          loading="lazy"
+          loading={index < 4 ? "eager" : "lazy"}
           decoding="async"
-          width={768}
-          height={960}
+          fetchPriority={index < 4 ? "high" : "auto"}
+          width={400}
+          height={500}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
