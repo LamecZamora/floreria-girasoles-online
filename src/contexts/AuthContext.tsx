@@ -130,6 +130,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signOut = useCallback(async () => {
+    if (typeof sessionStorage !== "undefined") {
+      // Clear cached admin-role flags
+      Object.keys(sessionStorage)
+        .filter((k) => k.startsWith("admin_role:"))
+        .forEach((k) => sessionStorage.removeItem(k));
+    }
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
