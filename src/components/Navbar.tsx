@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { ShoppingCart, Menu, X, User, LogOut, Settings, ClipboardList, ShieldCheck, ShieldAlert } from "lucide-react";
+import { ShoppingCart, Menu, X, User, LogOut, Settings, ClipboardList, ShieldCheck, ShieldAlert, Package } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
@@ -69,7 +69,10 @@ const Navbar = () => {
             />
           )}
           {isAdmin && (
-            <NavItem to="/admin" label="Admin" active={location.pathname === "/admin"} icon={<Settings className="h-3.5 w-3.5" />} />
+            <>
+              <NavItem to="/admin/productos" label="Productos" active={location.pathname.startsWith("/admin/productos")} icon={<Package className="h-3.5 w-3.5" />} />
+              <NavItem to="/admin" label="Admin" active={location.pathname === "/admin"} icon={<Settings className="h-3.5 w-3.5" />} />
+            </>
           )}
         </div>
 
@@ -141,7 +144,10 @@ const Navbar = () => {
                   </MobileLink>
                 )}
                 {isAdmin && (
-                  <MobileLink to="/admin" onClick={() => setMobileOpen(false)} icon="⚙️" active={location.pathname === "/admin"}>Panel Admin</MobileLink>
+                  <>
+                    <MobileLink to="/admin/productos" onClick={() => setMobileOpen(false)} icon="📦" active={location.pathname.startsWith("/admin/productos")}>Productos</MobileLink>
+                    <MobileLink to="/admin" onClick={() => setMobileOpen(false)} icon="⚙️" active={location.pathname === "/admin"}>Panel Admin</MobileLink>
+                  </>
                 )}
               </div>
               <div className="px-6 pb-8 safe-bottom space-y-3">
