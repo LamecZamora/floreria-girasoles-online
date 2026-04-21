@@ -6,7 +6,7 @@ import { useAllProductsAdmin, resolveProductImage, type DbProduct } from "@/hook
 import { categoryLabels, type Category } from "@/data/products";
 import {
   Plus, Pencil, Trash2, X, Upload, Loader2, AlertTriangle, ArrowLeft, Package,
-  Eye, EyeOff, Search, ArrowUpDown, CheckCircle2,
+  Eye, EyeOff, Search, ArrowUpDown, CheckCircle2, PackageX,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
@@ -58,6 +58,7 @@ function AdminProductosPage() {
   const [sort, setSort] = useState<SortKey>("recent");
   const [confirmDelete, setConfirmDelete] = useState<DbProduct | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [busyProductId, setBusyProductId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -131,23 +132,47 @@ function AdminProductosPage() {
   }
 
   const toggleActive = async (p: DbProduct) => {
-    const { error } = await supabase.from("products").update({ active: !p.active }).eq("id", p.id);
-    if (error) setToast("Error: " + error.message);
-    else {
+    setBusyProductId(p.id);
+    try {
+      const { error } = await supabase.from("products").update({ active: !p.active }).eq("id", p.id);
+      if (error) throw error;
       setToast(`"${p.name}" ${!p.active ? "activado" : "desactivado"}`);
       refetch();
+    } catch (err) {
+      setToast("Error: " + (err instanceof Error ? err.message : "No se pudo actualizar"));
+    } finally {
+      setBusyProductId(null);
+    }
+  };
+
+  const markOutOfStock = async (p: DbProduct) => {
+    setBusyProductId(p.id);
+    try {
+      const { error } = await supabase.from("products").update({ stock: 0 }).eq("id", p.id);
+      if (error) throw error;
+      setToast(`"${p.name}" marcado sin stock`);
+      refetch();
+    } catch (err) {
+      setToast("Error: " + (err instanceof Error ? err.message : "No se pudo actualizar"));
+    } finally {
+      setBusyProductId(null);
     }
   };
 
   const performDelete = async () => {
     if (!confirmDelete) return;
-    const { error } = await supabase.from("products").delete().eq("id", confirmDelete.id);
-    if (error) setToast("Error al eliminar: " + error.message);
-    else {
+    setBusyProductId(confirmDelete.id);
+    try {
+      const { error } = await supabase.from("products").delete().eq("id", confirmDelete.id);
+      if (error) throw error;
       setToast(`"${confirmDelete.name}" eliminado`);
       refetch();
+    } catch (err) {
+      setToast("Error al eliminar: " + (err instanceof Error ? err.message : "No se pudo eliminar"));
+    } finally {
+      setBusyProductId(null);
+      setConfirmDelete(null);
     }
-    setConfirmDelete(null);
   };
 
   return (
