@@ -130,11 +130,23 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     overflow-x: hidden;
-    /* Subtle floral wallpaper — SVG of small flowers in brand colors. */
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><defs><g id='f'><circle cx='0' cy='0' r='4' fill='%23e8b842' opacity='0.55'/><ellipse cx='-7' cy='0' rx='5' ry='3' fill='%23f2c75a' opacity='0.32'/><ellipse cx='7' cy='0' rx='5' ry='3' fill='%23f2c75a' opacity='0.32'/><ellipse cx='0' cy='-7' rx='3' ry='5' fill='%23f2c75a' opacity='0.32'/><ellipse cx='0' cy='7' rx='3' ry='5' fill='%23f2c75a' opacity='0.32'/><ellipse cx='-5' cy='-5' rx='4' ry='2.6' fill='%23f2c75a' opacity='0.28' transform='rotate(-45)'/><ellipse cx='5' cy='-5' rx='4' ry='2.6' fill='%23f2c75a' opacity='0.28' transform='rotate(45)'/><ellipse cx='-5' cy='5' rx='4' ry='2.6' fill='%23f2c75a' opacity='0.28' transform='rotate(45)'/><ellipse cx='5' cy='5' rx='4' ry='2.6' fill='%23f2c75a' opacity='0.28' transform='rotate(-45)'/></g><g id='r'><circle cx='0' cy='0' r='2.5' fill='%23c97a8a' opacity='0.45'/><ellipse cx='-4' cy='-2' rx='3.5' ry='2' fill='%23e8a8b3' opacity='0.32' transform='rotate(-25)'/><ellipse cx='4' cy='-2' rx='3.5' ry='2' fill='%23e8a8b3' opacity='0.32' transform='rotate(25)'/><ellipse cx='-4' cy='2' rx='3.5' ry='2' fill='%23e8a8b3' opacity='0.32' transform='rotate(25)'/><ellipse cx='4' cy='2' rx='3.5' ry='2' fill='%23e8a8b3' opacity='0.32' transform='rotate(-25)'/></g><g id='l'><path d='M0 0 Q4 -8 0 -14 Q-4 -8 0 0 Z' fill='%23a8c4a0' opacity='0.30'/></g></defs><use href='%23f' x='30' y='40'/><use href='%23r' x='95' y='25'/><use href='%23l' x='150' y='55' transform='rotate(20 150 55)'/><use href='%23f' x='185' y='110'/><use href='%23r' x='55' y='130'/><use href='%23l' x='110' y='115' transform='rotate(-30 110 115)'/><use href='%23f' x='25' y='185'/><use href='%23r' x='150' y='180'/><use href='%23l' x='195' y='195' transform='rotate(60 195 195)'/></svg>");
-    background-repeat: repeat;
-    background-size: 280px 280px;
+    position: relative;
+  }
+
+  /* Translucent floral wallpaper covering the whole viewport, fixed so it
+     stays in place while the user scrolls. Sits behind every page. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("/src/assets/floral-bg.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     background-attachment: fixed;
+    opacity: 0.18;
   }
 
   h1, h2, h3, h4, h5, h6 {
