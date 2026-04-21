@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { Shield, Users, Package, LogOut, AlertTriangle, ClipboardList, ArrowRight, ShieldAlert } from "lucide-react";
@@ -24,6 +24,7 @@ interface UserProfile {
 function AdminPage() {
   const { user, isAdmin, mfaVerified, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [productCount, setProductCount] = useState<number>(0);
@@ -101,6 +102,10 @@ function AdminPage() {
         </motion.div>
       </div>
     );
+  }
+
+  if (location.pathname !== "/admin") {
+    return <Outlet />;
   }
 
   return (
