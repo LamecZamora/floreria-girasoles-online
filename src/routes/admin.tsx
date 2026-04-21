@@ -37,10 +37,28 @@ function AdminPage() {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    if (isAdmin) {
-      loadUsers();
-      loadCounts();
-    }
+    if (!isAdmin) return;
+    loadUsers();
+    loadCounts();
+
+    // Realtime: nuevos usuarios y cambios en pedidos/productos se reflejan al instante
+    supabase.realtime.setAuth();
+    const channel = supabase
+      .channel("admin:dashboard", { config: { private: true } })
+      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => {
+        loadUsers();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => {
+        loadCounts();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => {
+        loadCounts();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [isAdmin]);
 
   const loadCounts = async () => {
