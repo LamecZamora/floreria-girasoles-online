@@ -47,6 +47,8 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://hrebeqkhkdiqxpjojxjs.supabase.co", crossOrigin: "anonymous" },
+      { rel: "dns-prefetch", href: "https://hrebeqkhkdiqxpjojxjs.supabase.co" },
     ],
   }),
   shellComponent: RootShell,

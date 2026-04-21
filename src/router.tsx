@@ -59,10 +59,12 @@ export const getRouter = () => {
     routeTree,
     context: {},
     scrollRestoration: true,
-    // Disabled because this TanStack Router version can throw during intent preloads on some generated routes.
-    defaultPreload: false,
-    // Keep loaded route data fresh for 60s to avoid re-fetching on back/forward
-    defaultStaleTime: 60_000,
+    // Preload route chunks on hover/touch for instant navigation
+    defaultPreload: "intent",
+    defaultPreloadDelay: 50,
+    // Keep loaded route data fresh for 5 minutes
+    defaultStaleTime: 5 * 60_000,
+    defaultPreloadStaleTime: 5 * 60_000,
     // GC unused route caches after 10 minutes
     defaultGcTime: 10 * 60_000,
     defaultErrorComponent: DefaultErrorComponent,

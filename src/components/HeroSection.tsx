@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Clock, Star } from "lucide-react";
-import heroImage from "@/assets/hero-floreria.jpg";
+import heroImage from "@/assets/hero-floreria.webp";
 import { motion } from "framer-motion";
 
 const HeroSection = () => (
