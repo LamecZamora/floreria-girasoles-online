@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SeguridadRouteImport } from './routes/seguridad'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PedidosRouteImport } from './routes/pedidos'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -32,6 +33,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const PedidosRoute = PedidosRouteImport.update({
   id: '/pedidos',
   path: '/pedidos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogoRoute = CatalogoRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/catalogo': typeof CatalogoRoute
+  '/faq': typeof FaqRoute
   '/pedidos': typeof PedidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seguridad': typeof SeguridadRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/catalogo': typeof CatalogoRoute
+  '/faq': typeof FaqRoute
   '/pedidos': typeof PedidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seguridad': typeof SeguridadRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/catalogo': typeof CatalogoRoute
+  '/faq': typeof FaqRoute
   '/pedidos': typeof PedidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seguridad': typeof SeguridadRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/catalogo'
+    | '/faq'
     | '/pedidos'
     | '/reset-password'
     | '/seguridad'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/catalogo'
+    | '/faq'
     | '/pedidos'
     | '/reset-password'
     | '/seguridad'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/catalogo'
+    | '/faq'
     | '/pedidos'
     | '/reset-password'
     | '/seguridad'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   CatalogoRoute: typeof CatalogoRoute
+  FaqRoute: typeof FaqRoute
   PedidosRoute: typeof PedidosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SeguridadRoute: typeof SeguridadRoute
@@ -166,6 +179,13 @@ declare module '@tanstack/react-router' {
       path: '/pedidos'
       fullPath: '/pedidos'
       preLoaderRoute: typeof PedidosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogo': {
@@ -238,6 +258,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   CatalogoRoute: CatalogoRoute,
+  FaqRoute: FaqRoute,
   PedidosRoute: PedidosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SeguridadRoute: SeguridadRoute,
