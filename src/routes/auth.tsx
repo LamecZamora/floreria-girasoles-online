@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, Mail, Lock, User, AlertTriangle, Flower2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { z } from "zod";
-import CaptchaChallenge from "@/components/CaptchaChallenge";
+import CaptchaChallenge, { type CaptchaHandle } from "@/components/CaptchaChallenge";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -37,9 +37,14 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [captchaVerified, setCaptchaVerified] = useState(false);
-  const [captchaKey, setCaptchaKey] = useState(0);
+  const captchaRef = useRef<CaptchaHandle>(null);
   const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
+
+  const resetCaptcha = useCallback(() => {
+    captchaRef.current?.refresh();
+    setCaptchaVerified(false);
+  }, []);
 
   const isLogin = mode === "login";
   const isSignup = mode === "signup";
@@ -50,9 +55,8 @@ function AuthPage() {
     setError("");
     setSuccess("");
     setPasswordErrors([]);
-    setCaptchaVerified(false);
-    setCaptchaKey(k => k + 1);
-  }, []);
+    resetCaptcha();
+  }, [resetCaptcha]);
 
   // Redirect inside effect to avoid setState during render warnings
   useEffect(() => {
@@ -77,43 +81,47 @@ function AuthPage() {
     }
 
     setLoading(true);
+    let hadError = false;
     try {
       const emailResult = emailSchema.safeParse(email);
       if (!emailResult.success) {
         setError(emailResult.error.errors[0].message);
-        setLoading(false);
+        hadError = true;
         return;
       }
 
       if (isLogin) {
         const { error } = await signIn(email.trim(), password);
-        if (error) setError(translateAuthError(error));
+        if (error) { setError(translateAuthError(error)); hadError = true; }
         else navigate({ to: "/" });
       } else if (isForgot) {
         const { error } = await resetPassword(email.trim());
-        if (error) setError(translateAuthError(error));
+        if (error) { setError(translateAuthError(error)); hadError = true; }
         else setSuccess("Si el email existe, recibirás un enlace para restablecer tu contraseña.");
       } else {
         const nameResult = nameSchema.safeParse(fullName);
         if (!nameResult.success) {
           setError(nameResult.error.errors[0].message);
-          setLoading(false);
+          hadError = true;
           return;
         }
         const pwdResult = passwordSchema.safeParse(password);
         if (!pwdResult.success) {
           setError(pwdResult.error.errors[0].message);
-          setLoading(false);
+          hadError = true;
           return;
         }
         const { error } = await signUp(email.trim(), password, fullName.trim());
-        if (error) setError(translateAuthError(error));
+        if (error) { setError(translateAuthError(error)); hadError = true; }
         else setSuccess("¡Cuenta creada! Revisa tu email para confirmar tu cuenta.");
       }
     } catch {
       setError("Error inesperado. Intenta de nuevo.");
+      hadError = true;
     } finally {
       setLoading(false);
+      // Regenerate captcha on every failed attempt for extra security
+      if (hadError) resetCaptcha();
     }
   };
 
@@ -235,7 +243,7 @@ function AuthPage() {
               </div>
             )}
 
-            <CaptchaChallenge key={captchaKey} onVerified={setCaptchaVerified} />
+            <CaptchaChallenge ref={captchaRef} onVerified={setCaptchaVerified} />
 
             {error && (
               <div className="bg-destructive/10 text-destructive rounded-lg px-3 py-2 text-sm flex items-center gap-2">
