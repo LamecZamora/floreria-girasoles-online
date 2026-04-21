@@ -106,7 +106,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    if (error) return { error: error.message };
+    // Check if MFA is required after successful password auth
+    try {
+      const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      const required = data?.nextLevel === "aal2" && data?.currentLevel !== "aal2";
+      return { error: null, mfaRequired: required };
+    } catch {
+      return { error: null, mfaRequired: false };
+    }
   }, []);
 
   const signOut = useCallback(async () => {

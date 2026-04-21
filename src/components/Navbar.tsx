@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { ShoppingCart, Menu, X, User, LogOut, Settings, ClipboardList } from "lucide-react";
+import { ShoppingCart, Menu, X, User, LogOut, Settings, ClipboardList, ShieldCheck, ShieldAlert } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
@@ -8,7 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
   const { itemCount, setIsOpen } = useCart();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, mfaVerified, signOut } = useAuth();
+  const needs2FA = isAdmin && !mfaVerified;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
