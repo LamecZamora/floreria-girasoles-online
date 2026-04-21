@@ -254,7 +254,7 @@ function AuthPage() {
             )}
 
             {success && (
-              <div className="bg-green-500/10 text-green-700 rounded-lg px-3 py-2 text-sm">
+              <div className="bg-success/10 text-success rounded-lg px-3 py-2 text-sm">
                 {success}
               </div>
             )}

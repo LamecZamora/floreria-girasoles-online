@@ -167,7 +167,7 @@ function SecurityPage() {
         </Link>
 
         <div className="flex items-start gap-3 mb-6 sm:mb-8">
-          <div className={`p-3 rounded-2xl ${has2FA ? "bg-secondary/10 text-secondary" : "bg-amber-500/10 text-amber-600"}`}>
+          <div className={`p-3 rounded-2xl ${has2FA ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
             {has2FA ? <ShieldCheck className="h-6 w-6 sm:h-7 sm:w-7" /> : <ShieldAlert className="h-6 w-6 sm:h-7 sm:w-7" />}
           </div>
           <div className="flex-1 min-w-0">
