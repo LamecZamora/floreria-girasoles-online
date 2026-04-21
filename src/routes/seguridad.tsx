@@ -179,11 +179,11 @@ function SecurityPage() {
         </div>
 
         {isAdmin && !has2FA && (
-          <div className="bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 rounded-2xl p-4 mb-6 flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+          <div className="bg-accent/10 border border-accent/30 text-accent-foreground rounded-2xl p-4 mb-6 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5 text-accent" />
             <div className="text-sm">
-              <p className="font-semibold">2FA obligatorio para administradores</p>
-              <p className="text-xs mt-1 opacity-90">Como administrador, debes activar la autenticación de dos factores para proteger las acciones sensibles del sistema.</p>
+              <p className="font-semibold text-foreground">2FA obligatorio para administradores</p>
+              <p className="text-xs mt-1 text-muted-foreground">Como administrador, debes activar la autenticación de dos factores para proteger las acciones sensibles del sistema.</p>
             </div>
           </div>
         )}

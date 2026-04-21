@@ -66,9 +66,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (session?.user) {
         // Use setTimeout to avoid Supabase deadlock
-        setTimeout(() => checkAdminRole(session.user.id), 0);
+        setTimeout(() => {
+          checkAdminRole(session.user.id);
+          checkMfaStatus();
+        }, 0);
       } else {
         setIsAdmin(false);
+        setMfaRequired(false);
+        setMfaVerified(false);
       }
       setLoading(false);
     });
@@ -79,12 +84,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       if (session?.user) {
         checkAdminRole(session.user.id);
+        checkMfaStatus();
       }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [checkAdminRole]);
+  }, [checkAdminRole, checkMfaStatus]);
 
   const signUp = useCallback(async (email: string, password: string, fullName: string) => {
     const { error } = await supabase.auth.signUp({
@@ -108,6 +114,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setSession(null);
     setIsAdmin(false);
+    setMfaRequired(false);
+    setMfaVerified(false);
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
@@ -123,7 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signUp, signIn, signOut, resetPassword, updatePassword }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, mfaRequired, mfaVerified, signUp, signIn, signOut, resetPassword, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );
