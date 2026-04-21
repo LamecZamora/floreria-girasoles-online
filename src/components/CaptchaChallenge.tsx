@@ -69,17 +69,17 @@ const CaptchaChallenge = forwardRef<CaptchaHandle, CaptchaChallengeProps>(({ onV
   return (
     <div className={`rounded-xl border p-3 transition-colors duration-300 ${
       verified
-        ? "border-green-500 bg-green-500/10"
+        ? "border-success bg-success/10"
         : "border-border bg-muted/30"
     }`}>
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2 min-w-0">
           <div className={`h-5 w-5 rounded-full flex items-center justify-center transition-colors duration-300 flex-shrink-0 ${
-            verified ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
+            verified ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"
           }`}>
             {verified ? <Check className="h-3 w-3" /> : <span className="text-[10px] font-bold">?</span>}
           </div>
-          <span className={`text-xs font-medium transition-colors truncate ${verified ? "text-green-600" : "text-muted-foreground"}`}>
+          <span className={`text-xs font-medium transition-colors truncate ${verified ? "text-success" : "text-muted-foreground"}`}>
             {verified ? "Verificado" : "Resuelve para continuar"}
           </span>
         </div>
@@ -108,7 +108,7 @@ const CaptchaChallenge = forwardRef<CaptchaHandle, CaptchaChallengeProps>(({ onV
           disabled={verified}
           className={`w-16 sm:w-20 text-center font-mono text-base sm:text-lg font-bold py-2 rounded-lg border transition-all focus:outline-none focus:ring-2 ${
             verified
-              ? "border-green-500 bg-green-500/10 text-green-700 cursor-not-allowed"
+              ? "border-success bg-success/10 text-success cursor-not-allowed"
               : "border-border bg-background text-foreground focus:ring-primary/50"
           }`}
           aria-label="Respuesta del captcha"

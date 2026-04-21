@@ -53,11 +53,11 @@ interface Order {
 }
 
 const STATUS_CONFIG: Record<string, { icon: typeof Clock; label: string; color: string }> = {
-  pendiente: { icon: Clock, label: "Pendiente", color: "text-yellow-600 bg-yellow-500/10" },
-  confirmado: { icon: CheckCircle, label: "Confirmado", color: "text-blue-600 bg-blue-500/10" },
-  enviado: { icon: Truck, label: "Enviado", color: "text-purple-600 bg-purple-500/10" },
-  entregado: { icon: CheckCircle, label: "Entregado", color: "text-green-600 bg-green-500/10" },
-  cancelado: { icon: XCircle, label: "Cancelado", color: "text-red-600 bg-red-500/10" },
+  pendiente: { icon: Clock, label: "Pendiente", color: "text-warning bg-warning/10" },
+  confirmado: { icon: CheckCircle, label: "Confirmado", color: "text-info bg-info/10" },
+  enviado: { icon: Truck, label: "Enviado", color: "text-primary bg-primary/10" },
+  entregado: { icon: CheckCircle, label: "Entregado", color: "text-success bg-success/10" },
+  cancelado: { icon: XCircle, label: "Cancelado", color: "text-destructive bg-destructive/10" },
 };
 
 function PedidosPage() {
@@ -223,13 +223,13 @@ function PedidosPage() {
                     <div className="px-4 sm:px-5 pb-4 flex gap-2 border-t border-border/30 pt-3">
                       <button
                         onClick={() => updateStatus(order.id, "confirmado")}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-green-500/10 text-green-700 hover:bg-green-500/20 font-semibold text-sm transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-success/10 text-success hover:bg-success/20 font-semibold text-sm transition-colors"
                       >
                         <Check className="h-4 w-4" /> Confirmar
                       </button>
                       <button
                         onClick={() => updateStatus(order.id, "cancelado")}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-yellow-500/10 text-yellow-700 hover:bg-yellow-500/20 font-semibold text-sm transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-warning/10 text-warning hover:bg-warning/20 font-semibold text-sm transition-colors"
                       >
                         <XIcon className="h-4 w-4" /> Cancelar
                       </button>
@@ -284,7 +284,7 @@ function PedidosPage() {
                           href={`https://wa.me/${FLORERIA_WHATSAPP}?text=${encodeURIComponent(buildWhatsAppMessage(order, items))}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-lg bg-green-500/10 text-green-700 hover:bg-green-500/20 transition-colors font-medium"
+                          className="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-lg bg-success/10 text-success hover:bg-success/20 transition-colors font-medium"
                         >
                           <MessageCircle className="h-3.5 w-3.5" />
                           {isAdmin ? "Enviar por WhatsApp" : "Consultar por WhatsApp"}
