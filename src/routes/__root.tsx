@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import OrderNotifications from "@/components/OrderNotifications";
+import MfaGuard from "@/components/MfaGuard";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 
@@ -71,6 +72,7 @@ function RootComponent() {
   return (
     <AuthProvider>
       <CartProvider>
+        <MfaGuard />
         <OrderNotifications />
         <Navbar />
         <CartDrawer />
