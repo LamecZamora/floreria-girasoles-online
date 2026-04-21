@@ -342,14 +342,25 @@ function AdminProductosPage() {
                 <div className="flex gap-1.5">
                   <button
                     onClick={() => { setEditing(p); setFormOpen(true); }}
-                    className="flex-1 flex items-center justify-center gap-1 text-xs py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    disabled={busyProductId === p.id}
+                    className="flex-1 flex items-center justify-center gap-1 text-xs py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label={`Editar ${p.name}`}
                   >
                     <Pencil className="h-3 w-3" /> <span className="hidden xs:inline">Editar</span>
                   </button>
                   <button
+                    onClick={() => markOutOfStock(p)}
+                    disabled={busyProductId === p.id || p.stock === 0}
+                    className="flex items-center justify-center text-xs py-2 px-2.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={`Marcar ${p.name} sin stock`}
+                    title="Sin stock"
+                  >
+                    {busyProductId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <PackageX className="h-3 w-3" />}
+                  </button>
+                  <button
                     onClick={() => toggleActive(p)}
-                    className={`flex items-center justify-center text-xs py-2 px-2.5 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${
+                    disabled={busyProductId === p.id}
+                    className={`flex items-center justify-center text-xs py-2 px-2.5 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed ${
                       p.active
                         ? "bg-warning/10 text-warning hover:bg-warning/20"
                         : "bg-success/10 text-success hover:bg-success/20"
@@ -357,15 +368,16 @@ function AdminProductosPage() {
                     aria-label={p.active ? `Desactivar ${p.name}` : `Activar ${p.name}`}
                     title={p.active ? "Desactivar" : "Activar"}
                   >
-                    {p.active ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                    {busyProductId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : p.active ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
                   </button>
                   <button
                     onClick={() => setConfirmDelete(p)}
-                    className="flex items-center justify-center text-xs py-2 px-2.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    disabled={busyProductId === p.id}
+                    className="flex items-center justify-center text-xs py-2 px-2.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label={`Eliminar ${p.name}`}
                     title="Eliminar"
                   >
-                    <Trash2 className="h-3 w-3" />
+                    {busyProductId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
                   </button>
                 </div>
               </div>
