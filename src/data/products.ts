@@ -166,31 +166,9 @@ import pastelPanales from "@/assets/products/pastel-panales.webp";
 import decoracionBaby from "@/assets/products/decoracion-baby.webp";
 import orquideaBebe from "@/assets/products/orquidea-bebe.webp";
 import letrasBaby from "@/assets/products/letras-baby.webp";
+import { categoryLabels, type Category, type Product } from "@/lib/productTypes";
 
-export type Category = "xv-anos" | "bodas" | "14-febrero" | "cumpleanos" | "condolencias" | "graduaciones" | "dia-de-las-madres" | "aniversarios" | "decoracion" | "nacimientos";
-
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  image: string;
-  category: Category;
-}
-
-export const categoryLabels: Record<Category, string> = {
-  "14-febrero": "14 de Febrero",
-  bodas: "Bodas",
-  "xv-anos": "XV Años",
-  cumpleanos: "Cumpleaños",
-  condolencias: "Condolencias",
-  graduaciones: "Graduaciones",
-  "dia-de-las-madres": "Día de las Madres",
-  aniversarios: "Aniversarios",
-  decoracion: "Decoración",
-  nacimientos: "Nacimientos",
-};
+export { categoryLabels, type Category, type Product };
 
 export const mockProducts: Product[] = [
   // ==================== 14 DE FEBRERO (15) ====================
