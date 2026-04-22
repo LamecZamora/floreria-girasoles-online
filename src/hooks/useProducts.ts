@@ -5,17 +5,27 @@ import { mockProducts, type Product, type Category } from "@/data/products";
 // Map of legacy local image paths -> imported asset modules.
 // We register BOTH .jpg and .webp variants so DB rows that still reference
 // the old ".jpg" filename keep resolving to the new bundled WebP asset.
-function imageBasename(src: string): string {
-  const url = src.split("/").pop() || src;
-  return url.replace(/-[A-Za-z0-9_]{6,}\.(jpg|jpeg|png|webp|svg)$/i, ".$1");
+//
+// IMPORTANT: Vite's content-hash is appended right before the extension and
+// is *exactly* 8 url-safe base64 chars (e.g. "caja-aniversario-DXyZpQ_h.webp").
+// Match that exactly — a looser regex like `-[A-Za-z0-9_]{6,}` wrongly strips
+// real name segments such as "-aniversario", "-graduacion", "-flores", etc.
+function viteStripHash(filename: string): string {
+  return filename.replace(/-[A-Za-z0-9_-]{8}\.(jpg|jpeg|png|webp|svg)$/i, ".$1");
 }
 
 const localImageMap = new Map<string, string>();
 for (const p of mockProducts) {
-  const base = imageBasename(p.image); // e.g. "ramo-rosas-rojas.webp"
-  const stem = base.replace(/\.(webp|jpg|jpeg|png|svg)$/i, "");
-  localImageMap.set(`/src/assets/products/${base}`, p.image);
+  // p.image is the resolved Vite URL (already has hash baked in at build time,
+  // or is the raw "/src/assets/..." path during dev).
+  const file = p.image.split("/").pop() || p.image;
+  const cleanFile = viteStripHash(file);
+  const stem = cleanFile.replace(/\.(webp|jpg|jpeg|png|svg)$/i, "");
+  // Register every plausible legacy path the DB might still hold.
+  localImageMap.set(`/src/assets/products/${cleanFile}`, p.image);
   localImageMap.set(`/src/assets/products/${stem}.jpg`, p.image);
+  localImageMap.set(`/src/assets/products/${stem}.jpeg`, p.image);
+  localImageMap.set(`/src/assets/products/${stem}.png`, p.image);
   localImageMap.set(`/src/assets/products/${stem}.webp`, p.image);
 }
 
@@ -24,6 +34,13 @@ export function resolveProductImage(image: string): string {
   if (/^https?:\/\//i.test(image)) return image;
   const mapped = localImageMap.get(image);
   if (mapped) return mapped;
+  // Last-resort fallback: try matching by basename only.
+  const file = image.split("/").pop();
+  if (file) {
+    const stem = viteStripHash(file).replace(/\.(webp|jpg|jpeg|png|svg)$/i, "");
+    const fallback = localImageMap.get(`/src/assets/products/${stem}.webp`);
+    if (fallback) return fallback;
+  }
   return image;
 }
 
