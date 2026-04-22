@@ -2,7 +2,7 @@ import { ShoppingCart, Check } from "lucide-react";
 import type { Product } from "@/data/products";
 import { categoryLabels } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
-import { useState } from "react";
+import { memo, useState } from "react";
 
 interface ProductCardProps {
   product: Product;
@@ -35,9 +35,7 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
   };
 
   return (
-    <div className="card-product group animate-in fade-in duration-300"
-      style={{ animationDelay: `${Math.min(index * 30, 150)}ms` }}
-    >
+    <div className="card-product group" style={{ contentVisibility: "auto", containIntrinsicSize: "500px" } as React.CSSProperties}>
       <div className="relative overflow-hidden aspect-[4/5]">
         <img
           src={product.image}
@@ -106,4 +104,11 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
   );
 };
 
-export default ProductCard;
+// Memoize so unrelated state changes (cart updates, parent re-renders)
+// don't re-render every card in the catalog.
+export default memo(ProductCard, (prev, next) =>
+  prev.product.id === next.product.id &&
+  prev.product.stock === next.product.stock &&
+  prev.product.price === next.product.price &&
+  prev.index === next.index
+);
