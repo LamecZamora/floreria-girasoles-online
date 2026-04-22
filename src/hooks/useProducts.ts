@@ -2,28 +2,45 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { mockProducts, type Product, type Category } from "@/data/products";
 
-// Map of legacy local image paths -> imported asset modules.
-// We register BOTH .jpg and .webp variants so DB rows that still reference
-// the old ".jpg" filename keep resolving to the new bundled WebP asset.
-function imageBasename(src: string): string {
-  const url = src.split("/").pop() || src;
-  return url.replace(/-[A-Za-z0-9_]{6,}\.(jpg|jpeg|png|webp|svg)$/i, ".$1");
-}
+// Resolve every product image asset eagerly so we can look it up by filename.
+// `import.meta.glob` with `eager` + `import: 'default'` returns a map of
+// "/src/assets/products/<file>" -> bundled-and-hashed URL string.
+// This sidesteps any need to guess Vite's hash format with regex.
+const assetUrlByPath = import.meta.glob<string>(
+  "/src/assets/products/*.{webp,jpg,jpeg,png,svg}",
+  { eager: true, import: "default", query: "?url" }
+);
 
-const localImageMap = new Map<string, string>();
-for (const p of mockProducts) {
-  const base = imageBasename(p.image); // e.g. "ramo-rosas-rojas.webp"
-  const stem = base.replace(/\.(webp|jpg|jpeg|png|svg)$/i, "");
-  localImageMap.set(`/src/assets/products/${base}`, p.image);
-  localImageMap.set(`/src/assets/products/${stem}.jpg`, p.image);
-  localImageMap.set(`/src/assets/products/${stem}.webp`, p.image);
+// Build lookup tables keyed by the FILENAME (not full path) and by stem,
+// so DB rows that store ".jpg" but disk has ".webp" still resolve.
+const assetByFilename = new Map<string, string>();
+const assetByStem = new Map<string, string>();
+for (const [path, url] of Object.entries(assetUrlByPath)) {
+  const file = path.split("/").pop() ?? "";
+  const stem = file.replace(/\.(webp|jpg|jpeg|png|svg)$/i, "");
+  assetByFilename.set(file, url);
+  // Stem map: prefer .webp when multiple extensions exist for the same stem.
+  if (!assetByStem.has(stem) || /\.webp$/i.test(file)) {
+    assetByStem.set(stem, url);
+  }
 }
 
 export function resolveProductImage(image: string): string {
   if (!image) return "";
+  // Absolute URLs (Supabase storage, external CDNs) — pass through unchanged.
   if (/^https?:\/\//i.test(image)) return image;
-  const mapped = localImageMap.get(image);
-  if (mapped) return mapped;
+
+  // Match by full filename first (handles legacy ".jpg" rows when disk has the
+  // same filename), then fall back to stem (handles ".jpg" -> ".webp" swap).
+  const file = image.split("/").pop() ?? image;
+  const direct = assetByFilename.get(file);
+  if (direct) return direct;
+
+  const stem = file.replace(/\.(webp|jpg|jpeg|png|svg)$/i, "");
+  const byStem = assetByStem.get(stem);
+  if (byStem) return byStem;
+
+  // Last resort — return as-is. The <img onError> in callers shows a placeholder.
   return image;
 }
 
