@@ -35,10 +35,18 @@ interface CaptchaChallengeProps {
   onVerified: (verified: boolean) => void;
 }
 
+const PLACEHOLDER_CHALLENGE = { question: "— + —", answer: NaN };
+
 const CaptchaChallenge = forwardRef<CaptchaHandle, CaptchaChallengeProps>(({ onVerified }, ref) => {
-  const [challenge, setChallenge] = useState(generateChallenge);
+  // Start with a stable placeholder so SSR markup matches the first client render.
+  // The real random challenge is generated only after mount, avoiding hydration mismatch.
+  const [challenge, setChallenge] = useState<{ question: string; answer: number }>(PLACEHOLDER_CHALLENGE);
   const [input, setInput] = useState("");
   const [verified, setVerified] = useState(false);
+
+  useEffect(() => {
+    setChallenge(generateChallenge());
+  }, []);
 
   const refresh = useCallback(() => {
     setChallenge(generateChallenge());
