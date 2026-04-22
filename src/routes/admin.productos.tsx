@@ -6,7 +6,7 @@ import { useAllProductsAdmin, resolveProductImage, type DbProduct } from "@/hook
 import { categoryLabels, type Category } from "@/data/products";
 import {
   Plus, Pencil, Trash2, X, Upload, Loader2, AlertTriangle, ArrowLeft, Package,
-  Eye, EyeOff, Search, ArrowUpDown, CheckCircle2, PackageX,
+  Eye, EyeOff, Search, ArrowUpDown, CheckCircle2, PackageX, RotateCcw, ImagePlus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
@@ -348,37 +348,49 @@ function AdminProductosPage() {
                   >
                     <Pencil className="h-3 w-3" /> <span className="hidden xs:inline">Editar</span>
                   </button>
-                  <button
-                    onClick={() => markOutOfStock(p)}
-                    disabled={busyProductId === p.id || p.stock === 0}
-                    className="flex items-center justify-center text-xs py-2 px-2.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label={`Marcar ${p.name} sin stock`}
-                    title="Sin stock"
-                  >
-                    {busyProductId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <PackageX className="h-3 w-3" />}
-                  </button>
-                  <button
-                    onClick={() => toggleActive(p)}
-                    disabled={busyProductId === p.id}
-                    className={`flex items-center justify-center text-xs py-2 px-2.5 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed ${
-                      p.active
-                        ? "bg-warning/10 text-warning hover:bg-warning/20"
-                        : "bg-success/10 text-success hover:bg-success/20"
-                    }`}
-                    aria-label={p.active ? `Desactivar ${p.name}` : `Activar ${p.name}`}
-                    title={p.active ? "Desactivar" : "Activar"}
-                  >
-                    {busyProductId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : p.active ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                  </button>
-                  <button
-                    onClick={() => setConfirmDelete(p)}
-                    disabled={busyProductId === p.id}
-                    className="flex items-center justify-center text-xs py-2 px-2.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label={`Eliminar ${p.name}`}
-                    title="Eliminar"
-                  >
-                    {busyProductId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
-                  </button>
+                  {p.active && p.stock > 0 && (
+                    <button
+                      onClick={() => markOutOfStock(p)}
+                      disabled={busyProductId === p.id}
+                      className="flex items-center justify-center text-xs py-2 px-2.5 rounded-lg bg-warning/10 text-warning hover:bg-warning/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label={`Marcar ${p.name} sin stock`}
+                      title="Marcar sin stock"
+                    >
+                      {busyProductId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <PackageX className="h-3 w-3" />}
+                    </button>
+                  )}
+                  {p.active ? (
+                    <button
+                      onClick={() => toggleActive(p)}
+                      disabled={busyProductId === p.id}
+                      className="flex items-center justify-center text-xs py-2 px-2.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label={`Deshabilitar ${p.name}`}
+                      title="Deshabilitar (se conserva la imagen, se puede restaurar)"
+                    >
+                      {busyProductId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => toggleActive(p)}
+                        disabled={busyProductId === p.id}
+                        className="flex-1 flex items-center justify-center gap-1 text-xs py-2 px-2.5 rounded-lg bg-success/10 text-success hover:bg-success/20 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label={`Restaurar ${p.name}`}
+                        title="Restaurar producto"
+                      >
+                        {busyProductId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <><RotateCcw className="h-3 w-3" /> <span className="hidden xs:inline">Restaurar</span></>}
+                      </button>
+                      <button
+                        onClick={() => setConfirmDelete(p)}
+                        disabled={busyProductId === p.id}
+                        className="flex items-center justify-center text-xs py-2 px-2.5 rounded-lg bg-destructive/15 text-destructive hover:bg-destructive/25 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label={`Eliminar ${p.name} definitivamente`}
+                        title="Eliminar definitivamente"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </article>
@@ -543,6 +555,7 @@ function ProductForm({
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const isEdit = !!initial;
 
   const handleUpload = async (file: File) => {
@@ -720,7 +733,12 @@ function ProductForm({
           </div>
 
           <div>
-            <span className="block text-xs font-medium text-foreground mb-1.5">Imagen del producto</span>
+            <span className="block text-xs font-medium text-foreground mb-1.5">
+              Imagen del producto
+              {isEdit && form.image && (
+                <span className="text-muted-foreground ml-1 font-normal">· se conserva si no subes otra</span>
+              )}
+            </span>
             <div className="flex gap-3 items-start">
               <div className="relative h-24 w-24 rounded-xl bg-muted overflow-hidden flex-shrink-0 border border-border/50">
                 {form.image ? (
@@ -737,8 +755,8 @@ function ProductForm({
               </div>
               <div className="flex-1 space-y-2 min-w-0">
                 <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-border hover:border-primary/40 hover:bg-muted/30 cursor-pointer transition-colors text-sm focus-within:ring-2 focus-within:ring-primary/40">
-                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                  <span>{uploading ? "Subiendo..." : "Subir imagen"}</span>
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+                  <span>{uploading ? "Subiendo..." : isEdit && form.image ? "Cambiar imagen" : "Subir imagen"}</span>
                   <input
                     type="file" accept="image/*" className="sr-only"
                     onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); }}
@@ -746,15 +764,24 @@ function ProductForm({
                     aria-label="Seleccionar imagen del producto"
                   />
                 </label>
-                <input
-                  type="url"
-                  placeholder="O pega una URL de imagen"
-                  value={form.image}
-                  onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-                  aria-label="URL de imagen"
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                />
                 <p className="text-[10px] text-muted-foreground">Máx 5MB · JPG, PNG, WEBP</p>
+                <button
+                  type="button"
+                  onClick={() => setShowUrlInput((v) => !v)}
+                  className="text-[10px] text-muted-foreground hover:text-primary underline underline-offset-2"
+                >
+                  {showUrlInput ? "Ocultar URL externa" : "¿Prefieres pegar una URL?"}
+                </button>
+                {showUrlInput && (
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={form.image}
+                    onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+                    aria-label="URL de imagen"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  />
+                )}
               </div>
             </div>
           </div>
