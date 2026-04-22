@@ -11,7 +11,15 @@ import { mockProducts, type Product, type Category } from "@/data/products";
 // Match that exactly — a looser regex like `-[A-Za-z0-9_]{6,}` wrongly strips
 // real name segments such as "-aniversario", "-graduacion", "-flores", etc.
 function viteStripHash(filename: string): string {
-  return filename.replace(/-[A-Za-z0-9_-]{8}\.(jpg|jpeg|png|webp|svg)$/i, ".$1");
+  // Vite hashes are 8 url-safe-base64 chars and almost always include at least
+  // one uppercase letter, digit, or underscore. Project asset names are
+  // lowercase ascii words separated by hyphens, so requiring a "hash-like"
+  // character class here avoids stripping real name segments such as
+  // "memorial", "vertical", "tropical", "interior", etc.
+  return filename.replace(
+    /-(?=[A-Za-z0-9_-]{8}\.)(?=[A-Za-z0-9_-]*[A-Z0-9_])[A-Za-z0-9_-]{8}\.(jpg|jpeg|png|webp|svg)$/i,
+    ".$1"
+  );
 }
 
 const localImageMap = new Map<string, string>();
