@@ -61,12 +61,21 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     setSubmitting(false);
     if (error) {
       console.error("create_order error:", error);
-      const msg = error.message?.includes("Authentication")
+      const raw = error.message || "";
+      const stockMatch = raw.match(/Insufficient stock for ([^:]+): only (\d+) available/);
+      const unavailableMatch = raw.match(/Product not available: (.+)/);
+      const msg = raw.includes("Authentication")
         ? "Tu sesión expiró. Inicia sesión de nuevo."
-        : error.message?.includes("Invalid delivery")
+        : raw.includes("Invalid delivery")
         ? "La dirección de entrega no es válida."
-        : error.message?.includes("Cart is empty")
+        : raw.includes("Cart is empty")
         ? "Tu carrito está vacío."
+        : stockMatch
+        ? `Sin stock suficiente de "${stockMatch[1].trim()}". Solo quedan ${stockMatch[2]} disponibles.`
+        : unavailableMatch
+        ? `"${unavailableMatch[1].trim()}" ya no está disponible.`
+        : raw.includes("Unknown product")
+        ? "Uno de los productos ya no existe. Actualiza la página."
         : "No se pudo crear el pedido. Intenta de nuevo.";
       toast.error(msg);
       return;
