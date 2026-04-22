@@ -1,8 +1,8 @@
+/* @import rules MUST come before any other CSS at-rules or declarations.
+   Subset only the weights actually used: 600/700 display + 400/500/600/700 body. */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
-/* Subset only the weights actually used: 600/700 display + 400/500/600/700 body.
-   Removes ~40-50KB of unused font files vs the previous import. */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
