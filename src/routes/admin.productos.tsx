@@ -555,6 +555,7 @@ function ProductForm({
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const isEdit = !!initial;
 
   const handleUpload = async (file: File) => {
