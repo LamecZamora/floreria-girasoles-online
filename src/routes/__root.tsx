@@ -56,7 +56,6 @@ export const Route = createRootRoute({
       { rel: "dns-prefetch", href: "https://hrebeqkhkdiqxpjojxjs.supabase.co" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "preload", href: "/floral-bg.webp", as: "image", type: "image/webp", fetchPriority: "low" } as any,
     ],
   }),
   shellComponent: RootShell,
