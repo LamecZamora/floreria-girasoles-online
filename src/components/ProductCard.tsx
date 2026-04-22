@@ -1,6 +1,6 @@
 import { ShoppingCart, Check } from "lucide-react";
-import type { Product } from "@/data/products";
-import { categoryLabels } from "@/data/products";
+import type { Product } from "@/lib/productTypes";
+import { categoryLabels } from "@/lib/productTypes";
 import { useCart } from "@/contexts/CartContext";
 import { memo, useState } from "react";
 
