@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -56,7 +56,6 @@ export const Route = createRootRoute({
       { rel: "dns-prefetch", href: "https://hrebeqkhkdiqxpjojxjs.supabase.co" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "preload", href: "/floral-bg.webp", as: "image", type: "image/webp", fetchPriority: "low" } as any,
     ],
   }),
   shellComponent: RootShell,
@@ -79,17 +78,21 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const location = useLocation();
+
   useEffect(() => {
     // Kick off product fetch in parallel with the initial render so the
     // catalog/home are essentially instant once components mount.
-    prefetchProducts();
-  }, []);
+    if (location.pathname === "/" || location.pathname.startsWith("/catalogo")) {
+      prefetchProducts();
+    }
+  }, [location.pathname]);
 
   return (
     <AuthProvider>
       <CartProvider>
         <MfaGuard />
-        <OrderNotifications />
+        {(location.pathname === "/pedidos" || location.pathname.startsWith("/admin")) && <OrderNotifications />}
         <Navbar />
         <CartDrawer />
         <main className="min-h-screen">

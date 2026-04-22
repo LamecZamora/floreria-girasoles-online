@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { mockProducts, type Product, type Category } from "@/data/products";
+import type { Product, Category } from "@/lib/productTypes";
 
 // Resolve every product image asset eagerly so we can look it up by filename.
 // `import.meta.glob` with `eager` + `import: 'default'` returns a map of
@@ -67,6 +67,11 @@ export function dbToProduct(p: DbProduct): Product {
   };
 }
 
+async function loadMockProducts(): Promise<Product[]> {
+  const { mockProducts } = await import("@/data/products");
+  return mockProducts;
+}
+
 // ---------- Module-level cache ----------
 // Shared across all consumers so navigating between routes is instant.
 const STALE_MS = 5 * 60_000; // 5 minutes
@@ -90,9 +95,9 @@ async function fetchPublicProducts(): Promise<Product[]> {
 
   if (error) {
     console.error("Error loading products:", error);
-    return mockProducts;
+    return loadMockProducts();
   }
-  if (!data || data.length === 0) return mockProducts;
+  if (!data || data.length === 0) return loadMockProducts();
   return data.map(dbToProduct);
 }
 

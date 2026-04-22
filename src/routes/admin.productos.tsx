@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAllProductsAdmin, resolveProductImage, type DbProduct } from "@/hooks/useProducts";
-import { categoryLabels, type Category } from "@/data/products";
+import { categoryLabels, type Category } from "@/lib/productTypes";
 import {
   Plus, Pencil, Trash2, X, Upload, Loader2, AlertTriangle, ArrowLeft, Package,
   Eye, EyeOff, Search, ArrowUpDown, CheckCircle2, PackageX, RotateCcw, ImagePlus,

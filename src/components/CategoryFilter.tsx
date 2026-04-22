@@ -1,5 +1,5 @@
-import type { Category } from "@/data/products";
-import { categoryLabels } from "@/data/products";
+import type { Category } from "@/lib/productTypes";
+import { categoryLabels } from "@/lib/productTypes";
 import { useRef, useEffect } from "react";
 
 interface CategoryFilterProps {

@@ -3,7 +3,7 @@ import { ShoppingCart, Menu, X, User, LogOut, Settings, ClipboardList, ShieldChe
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
-import logo from "@/assets/logo-girasoles.png";
+import logo from "@/assets/logo-girasoles.webp";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
