@@ -732,7 +732,12 @@ function ProductForm({
           </div>
 
           <div>
-            <span className="block text-xs font-medium text-foreground mb-1.5">Imagen del producto</span>
+            <span className="block text-xs font-medium text-foreground mb-1.5">
+              Imagen del producto
+              {isEdit && form.image && (
+                <span className="text-muted-foreground ml-1 font-normal">· se conserva si no subes otra</span>
+              )}
+            </span>
             <div className="flex gap-3 items-start">
               <div className="relative h-24 w-24 rounded-xl bg-muted overflow-hidden flex-shrink-0 border border-border/50">
                 {form.image ? (
@@ -749,8 +754,8 @@ function ProductForm({
               </div>
               <div className="flex-1 space-y-2 min-w-0">
                 <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-border hover:border-primary/40 hover:bg-muted/30 cursor-pointer transition-colors text-sm focus-within:ring-2 focus-within:ring-primary/40">
-                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                  <span>{uploading ? "Subiendo..." : "Subir imagen"}</span>
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+                  <span>{uploading ? "Subiendo..." : isEdit && form.image ? "Cambiar imagen" : "Subir imagen"}</span>
                   <input
                     type="file" accept="image/*" className="sr-only"
                     onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f); }}
@@ -758,15 +763,24 @@ function ProductForm({
                     aria-label="Seleccionar imagen del producto"
                   />
                 </label>
-                <input
-                  type="url"
-                  placeholder="O pega una URL de imagen"
-                  value={form.image}
-                  onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-                  aria-label="URL de imagen"
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                />
                 <p className="text-[10px] text-muted-foreground">Máx 5MB · JPG, PNG, WEBP</p>
+                <button
+                  type="button"
+                  onClick={() => setShowUrlInput((v) => !v)}
+                  className="text-[10px] text-muted-foreground hover:text-primary underline underline-offset-2"
+                >
+                  {showUrlInput ? "Ocultar URL externa" : "¿Prefieres pegar una URL?"}
+                </button>
+                {showUrlInput && (
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={form.image}
+                    onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+                    aria-label="URL de imagen"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  />
+                )}
               </div>
             </div>
           </div>
