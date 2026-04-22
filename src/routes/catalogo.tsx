@@ -6,7 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import { Search, X, Loader2 } from "lucide-react";
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 12;
 
 export const Route = createFileRoute("/catalogo")({
   component: CatalogoPage,
