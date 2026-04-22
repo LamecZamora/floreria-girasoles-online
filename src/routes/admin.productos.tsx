@@ -6,7 +6,7 @@ import { useAllProductsAdmin, resolveProductImage, type DbProduct } from "@/hook
 import { categoryLabels, type Category } from "@/data/products";
 import {
   Plus, Pencil, Trash2, X, Upload, Loader2, AlertTriangle, ArrowLeft, Package,
-  Eye, EyeOff, Search, ArrowUpDown, CheckCircle2, PackageX,
+  Eye, EyeOff, Search, ArrowUpDown, CheckCircle2, PackageX, RotateCcw, ImagePlus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
