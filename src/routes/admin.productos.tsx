@@ -785,24 +785,9 @@ function ProductForm({
                     aria-label="Seleccionar imagen del producto"
                   />
                 </label>
-                <p className="text-[10px] text-muted-foreground">Máx 5MB · JPG, PNG, WEBP</p>
-                <button
-                  type="button"
-                  onClick={() => setShowUrlInput((v) => !v)}
-                  className="text-[10px] text-muted-foreground hover:text-primary underline underline-offset-2"
-                >
-                  {showUrlInput ? "Ocultar URL externa" : "¿Prefieres pegar una URL?"}
-                </button>
-                {showUrlInput && (
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    value={form.image}
-                    onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-                    aria-label="URL de imagen"
-                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                  />
-                )}
+                <p className="text-[10px] text-muted-foreground">
+                  Máx 5MB · JPG, PNG, WEBP · Se guarda en almacenamiento seguro
+                </p>
               </div>
             </div>
           </div>
