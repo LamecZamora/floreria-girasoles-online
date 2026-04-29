@@ -163,6 +163,11 @@ function AdminProductosPage() {
     if (!confirmDelete) return;
     setBusyProductId(confirmDelete.id);
     try {
+      // Borrar imagen del Storage si vive en nuestro bucket
+      const storagePath = extractStoragePath(confirmDelete.image);
+      if (storagePath) {
+        await supabase.storage.from("product-images").remove([storagePath]);
+      }
       const { error } = await supabase.from("products").delete().eq("id", confirmDelete.id);
       if (error) throw error;
       setToast(`"${confirmDelete.name}" eliminado`);
