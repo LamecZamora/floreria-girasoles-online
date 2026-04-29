@@ -572,7 +572,6 @@ function ProductForm({
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [showUrlInput, setShowUrlInput] = useState(false);
   const isEdit = !!initial;
 
   const handleUpload = async (file: File) => {
@@ -595,6 +594,11 @@ function ProductForm({
       });
       if (upErr) throw upErr;
       const { data: pub } = supabase.storage.from("product-images").getPublicUrl(path);
+      // Borrar la imagen anterior del Storage si era nuestra (evita basura acumulada)
+      const oldPath = extractStoragePath(form.image);
+      if (oldPath) {
+        await supabase.storage.from("product-images").remove([oldPath]).catch(() => {});
+      }
       setForm((f) => ({ ...f, image: pub.publicUrl }));
     } catch (err) {
       setError("Error al subir: " + (err instanceof Error ? err.message : "desconocido"));
