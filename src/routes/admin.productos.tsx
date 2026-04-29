@@ -35,6 +35,18 @@ const productSchema = z.object({
 type FormState = z.infer<typeof productSchema>;
 type SortKey = "recent" | "name" | "price-asc" | "price-desc" | "stock";
 
+/**
+ * Si la URL apunta a nuestro bucket `product-images`, devuelve el path interno
+ * para poder borrarla del Storage. Para URLs externas devuelve null.
+ */
+function extractStoragePath(url: string): string | null {
+  if (!url) return null;
+  const marker = "/storage/v1/object/public/product-images/";
+  const idx = url.indexOf(marker);
+  if (idx === -1) return null;
+  return decodeURIComponent(url.slice(idx + marker.length));
+}
+
 const empty: FormState = {
   id: "",
   name: "",
