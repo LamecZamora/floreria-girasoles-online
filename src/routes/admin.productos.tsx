@@ -35,6 +35,18 @@ const productSchema = z.object({
 type FormState = z.infer<typeof productSchema>;
 type SortKey = "recent" | "name" | "price-asc" | "price-desc" | "stock";
 
+/**
+ * Si la URL apunta a nuestro bucket `product-images`, devuelve el path interno
+ * para poder borrarla del Storage. Para URLs externas devuelve null.
+ */
+function extractStoragePath(url: string): string | null {
+  if (!url) return null;
+  const marker = "/storage/v1/object/public/product-images/";
+  const idx = url.indexOf(marker);
+  if (idx === -1) return null;
+  return decodeURIComponent(url.slice(idx + marker.length));
+}
+
 const empty: FormState = {
   id: "",
   name: "",
@@ -163,6 +175,11 @@ function AdminProductosPage() {
     if (!confirmDelete) return;
     setBusyProductId(confirmDelete.id);
     try {
+      // Borrar imagen del Storage si vive en nuestro bucket
+      const storagePath = extractStoragePath(confirmDelete.image);
+      if (storagePath) {
+        await supabase.storage.from("product-images").remove([storagePath]);
+      }
       const { error } = await supabase.from("products").delete().eq("id", confirmDelete.id);
       if (error) throw error;
       setToast(`"${confirmDelete.name}" eliminado`);
@@ -555,7 +572,6 @@ function ProductForm({
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [showUrlInput, setShowUrlInput] = useState(false);
   const isEdit = !!initial;
 
   const handleUpload = async (file: File) => {
@@ -578,6 +594,11 @@ function ProductForm({
       });
       if (upErr) throw upErr;
       const { data: pub } = supabase.storage.from("product-images").getPublicUrl(path);
+      // Borrar la imagen anterior del Storage si era nuestra (evita basura acumulada)
+      const oldPath = extractStoragePath(form.image);
+      if (oldPath) {
+        await supabase.storage.from("product-images").remove([oldPath]).catch(() => {});
+      }
       setForm((f) => ({ ...f, image: pub.publicUrl }));
     } catch (err) {
       setError("Error al subir: " + (err instanceof Error ? err.message : "desconocido"));
@@ -764,24 +785,9 @@ function ProductForm({
                     aria-label="Seleccionar imagen del producto"
                   />
                 </label>
-                <p className="text-[10px] text-muted-foreground">Máx 5MB · JPG, PNG, WEBP</p>
-                <button
-                  type="button"
-                  onClick={() => setShowUrlInput((v) => !v)}
-                  className="text-[10px] text-muted-foreground hover:text-primary underline underline-offset-2"
-                >
-                  {showUrlInput ? "Ocultar URL externa" : "¿Prefieres pegar una URL?"}
-                </button>
-                {showUrlInput && (
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    value={form.image}
-                    onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-                    aria-label="URL de imagen"
-                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                  />
-                )}
+                <p className="text-[10px] text-muted-foreground">
+                  Máx 5MB · JPG, PNG, WEBP · Se guarda en almacenamiento seguro
+                </p>
               </div>
             </div>
           </div>
