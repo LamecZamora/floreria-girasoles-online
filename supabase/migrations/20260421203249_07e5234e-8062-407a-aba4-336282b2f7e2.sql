@@ -111,7 +111,7 @@ DO $$
 DECLARE
   _new_admin_id uuid;
   _email text := 'floreriagirasoles1524@gmail.com';
-  _password text := 'Gr!s0l$2026_Adm!n';
+  _password text := '__REDACTED_SET_PASSWORD_VIA_DASHBOARD__';
 BEGIN
   SELECT id INTO _new_admin_id FROM auth.users WHERE lower(email) = lower(_email) LIMIT 1;
 

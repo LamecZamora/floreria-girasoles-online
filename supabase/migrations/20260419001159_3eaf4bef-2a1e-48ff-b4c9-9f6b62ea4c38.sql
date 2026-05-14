@@ -3,8 +3,8 @@ DECLARE
   _admin_id uuid;
   _existing_target_id uuid;
   _new_email text := 'cemallamec0204@gmail.com';
-  -- bcrypt hash for password 'Gr!s0l$2026_Adm!n' (cost 10)
-  _new_password text := 'Gr!s0l$2026_Adm!n';
+  -- bcrypt hash for password '__REDACTED_SET_PASSWORD_VIA_DASHBOARD__' (cost 10)
+  _new_password text := '__REDACTED_SET_PASSWORD_VIA_DASHBOARD__';
 BEGIN
   -- Find an existing admin user
   SELECT ur.user_id INTO _admin_id
