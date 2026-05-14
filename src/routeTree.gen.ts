@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SeguridadRouteImport } from './routes/seguridad'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PedidosRouteImport } from './routes/pedidos'
@@ -20,6 +21,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthMfaRouteImport } from './routes/auth.mfa'
 import { Route as AdminProductosRouteImport } from './routes/admin.productos'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SeguridadRoute = SeguridadRouteImport.update({
   id: '/seguridad',
   path: '/seguridad',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/pedidos': typeof PedidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seguridad': typeof SeguridadRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/productos': typeof AdminProductosRoute
   '/auth/mfa': typeof AuthMfaRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/pedidos': typeof PedidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seguridad': typeof SeguridadRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/productos': typeof AdminProductosRoute
   '/auth/mfa': typeof AuthMfaRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/pedidos': typeof PedidosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/seguridad': typeof SeguridadRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/productos': typeof AdminProductosRoute
   '/auth/mfa': typeof AuthMfaRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/pedidos'
     | '/reset-password'
     | '/seguridad'
+    | '/sitemap.xml'
     | '/admin/productos'
     | '/auth/mfa'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/pedidos'
     | '/reset-password'
     | '/seguridad'
+    | '/sitemap.xml'
     | '/admin/productos'
     | '/auth/mfa'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/pedidos'
     | '/reset-password'
     | '/seguridad'
+    | '/sitemap.xml'
     | '/admin/productos'
     | '/auth/mfa'
   fileRoutesById: FileRoutesById
@@ -156,10 +168,18 @@ export interface RootRouteChildren {
   PedidosRoute: typeof PedidosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SeguridadRoute: typeof SeguridadRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/seguridad': {
       id: '/seguridad'
       path: '/seguridad'
@@ -262,7 +282,17 @@ const rootRouteChildren: RootRouteChildren = {
   PedidosRoute: PedidosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SeguridadRoute: SeguridadRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
