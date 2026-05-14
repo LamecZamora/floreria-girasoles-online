@@ -13,10 +13,30 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Florería Girasoles - Arreglos Florales Artesanales" },
-      { name: "description", content: "Creamos arreglos florales únicos para cada momento especial. Bodas, XV años, cumpleaños y más en Durango, México." },
-      { property: "og:title", content: "Florería Girasoles - Arreglos Florales Artesanales" },
-      { property: "og:description", content: "Creamos arreglos florales únicos para cada momento especial." },
+      { title: "Florería Girasoles Durango | Arreglos Florales Artesanales" },
+      { name: "description", content: "Florería Girasoles en Durango, México. Arreglos florales artesanales para bodas, XV años, cumpleaños y todo momento especial. Entrega a domicilio." },
+      { name: "keywords", content: "florería girasoles, floreria girasoles durango, arreglos florales durango, ramos de flores, bodas, xv años, flores a domicilio durango" },
+      { property: "og:title", content: "Florería Girasoles Durango | Arreglos Florales Artesanales" },
+      { property: "og:description", content: "Arreglos florales artesanales en Durango. Bodas, XV años, cumpleaños y entregas a domicilio." },
+      { property: "og:url", content: "https://floreria-girasoles.lovable.app/" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://floreria-girasoles.lovable.app/" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Florist",
+          name: "Florería Girasoles",
+          description: "Arreglos florales artesanales en Durango, México.",
+          url: "https://floreria-girasoles.lovable.app/",
+          image: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c71d9071-14a2-4db1-9e4c-62980025ed17/id-preview-989a6637--3fb80125-d289-4e94-8021-71c4300fb3b4.lovable.app-1776484561615.png",
+          areaServed: { "@type": "City", name: "Durango" },
+          address: { "@type": "PostalAddress", addressLocality: "Durango", addressCountry: "MX" },
+        }),
+      },
     ],
   }),
 });

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /seguridad
+Disallow: /pedidos
+
+Sitemap: https://floreria-girasoles.lovable.app/sitemap.xml
