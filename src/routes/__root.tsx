@@ -41,6 +41,7 @@ export const Route = createRootRoute({
       { httpEquiv: "Permissions-Policy", content: "camera=(), microphone=(), geolocation=(), payment=()" },
       { name: "format-detection", content: "telephone=no" },
       { name: "robots", content: "index, follow" },
+      { name: "google-site-verification", content: "LMyHO2f-4XOTZ6m9JBd_DjR0D1DuhnlSyPDvfq-CetI" },
       { property: "og:title", content: "Florería Girasoles" },
       { name: "twitter:title", content: "Florería Girasoles" },
       { property: "og:description", content: "Arreglos florales artesanales para cada momento especial" },
