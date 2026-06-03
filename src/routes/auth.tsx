@@ -50,6 +50,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const captchaRef = useRef<CaptchaHandle>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
