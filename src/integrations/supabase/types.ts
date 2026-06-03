@@ -18,7 +18,6 @@ export type Database = {
         Row: {
           created_at: string
           delivery_address: string | null
-          delivery_date: string | null
           id: string
           items: Json
           notes: string | null
@@ -30,7 +29,6 @@ export type Database = {
         Insert: {
           created_at?: string
           delivery_address?: string | null
-          delivery_date?: string | null
           id?: string
           items?: Json
           notes?: string | null
@@ -42,7 +40,6 @@ export type Database = {
         Update: {
           created_at?: string
           delivery_address?: string | null
-          delivery_date?: string | null
           id?: string
           items?: Json
           notes?: string | null
@@ -140,53 +137,6 @@ export type Database = {
         }
         Relationships: []
       }
-      reviews: {
-        Row: {
-          approved: boolean
-          comment: string
-          created_at: string
-          customer_name: string
-          id: string
-          image_url: string | null
-          order_id: string | null
-          rating: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          approved?: boolean
-          comment: string
-          created_at?: string
-          customer_name: string
-          id?: string
-          image_url?: string | null
-          order_id?: string | null
-          rating: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          approved?: boolean
-          comment?: string
-          created_at?: string
-          customer_name?: string
-          id?: string
-          image_url?: string | null
-          order_id?: string | null
-          rating?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_roles: {
         Row: {
           created_at: string
@@ -214,12 +164,7 @@ export type Database = {
     }
     Functions: {
       create_order: {
-        Args: {
-          _delivery_address: string
-          _delivery_date: string
-          _items: Json
-          _notes?: string
-        }
+        Args: { _delivery_address: string; _items: Json; _notes?: string }
         Returns: string
       }
       has_role: {
