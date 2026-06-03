@@ -125,6 +125,29 @@ export function prefetchProducts() {
   void loadPublic();
 }
 
+// ---------- Realtime ----------
+// Suscripción global a cambios en `products`. Cuando algo cambia
+// (INSERT/UPDATE/DELETE), invalidamos cachés y refetcheamos para que
+// todos los componentes montados se actualicen al instante.
+let realtimeStarted = false;
+function startRealtime() {
+  if (realtimeStarted || typeof window === "undefined") return;
+  realtimeStarted = true;
+  supabase
+    .channel("products-changes")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "products" },
+      () => {
+        publicCache = null;
+        adminCache = null;
+        void loadPublic(true);
+        if (adminSubscribers.size > 0) void loadAdmin(true);
+      }
+    )
+    .subscribe();
+}
+
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>(() => publicCache?.data ?? []);
   const [loading, setLoading] = useState(() => !publicCache);
@@ -145,6 +168,7 @@ export function useProducts() {
 
   useEffect(() => {
     let mounted = true;
+    startRealtime();
     const sub = (data: Product[]) => { if (mounted) setProducts(data); };
     publicSubscribers.add(sub);
 
@@ -216,6 +240,7 @@ export function useAllProductsAdmin() {
 
   useEffect(() => {
     let mounted = true;
+    startRealtime();
     const sub = (data: DbProduct[]) => { if (mounted) setProducts(data); };
     adminSubscribers.add(sub);
 
