@@ -74,7 +74,7 @@ const Footer = () => (
         <div className="rounded-2xl overflow-hidden border border-primary-foreground/10 shadow-lg">
           <iframe
             title="Ubicación Florería Girasoles - Durango"
-            src="https://www.google.com/maps?q=Durango,%20Mexico&output=embed"
+            src="https://www.google.com/maps?q=Belisario+Dom%C3%ADnguez+409,+Barrio+de+Analco,+34138+Durango,+Dgo&output=embed"
             width="100%"
             height="280"
             style={{ border: 0 }}
