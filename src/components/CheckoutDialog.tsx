@@ -47,6 +47,10 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
       toast.error("Ingresa una dirección válida");
       return;
     }
+    if (!deliveryDate || deliveryDate < minDate) {
+      toast.error("Los pedidos deben hacerse con al menos 10 días de anticipación");
+      return;
+    }
     setSubmitting(true);
 
     // Capture cart snapshot BEFORE clearing (for WhatsApp message)
@@ -68,6 +72,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     const { data: orderId, error } = await supabase.rpc("create_order", {
       _items: orderItems,
       _delivery_address: address.trim(),
+      _delivery_date: deliveryDate,
       _notes: notes.trim() || undefined,
     });
 
