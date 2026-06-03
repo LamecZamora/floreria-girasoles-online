@@ -111,7 +111,8 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
       `📧 *Email:* ${user.email}\n\n` +
       `📦 *Productos:*\n${itemsText}\n\n` +
       `💰 *Total: $${totalSnapshot.toLocaleString("es-MX")} MXN*\n\n` +
-      `📍 *Dirección de entrega:*\n${address.trim()}` +
+      `📍 *Dirección de entrega:*\n${address.trim()}\n\n` +
+      `📅 *Fecha de entrega:* ${new Date(deliveryDate + "T00:00:00").toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}` +
       (notes.trim() ? `\n\n📝 *Notas:*\n${notes.trim()}` : "");
 
     const FLORERIA_WHATSAPP = "5216181169706"; // +52 618 116 9706
@@ -123,6 +124,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     setTimeout(() => {
       setSuccess(false);
       setAddress("");
+      setDeliveryDate("");
       setNotes("");
       onClose();
       setIsOpen(false);
