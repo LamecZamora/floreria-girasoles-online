@@ -5,6 +5,7 @@ import { useProducts } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import HeroSection from "@/components/HeroSection";
+import ReviewsSection from "@/components/ReviewsSection";
 import { Sparkles, ArrowRight, Truck, Shield, Heart, Loader2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
@@ -151,6 +152,8 @@ function Index() {
           </div>
         </div>
       </section>
+
+      <ReviewsSection />
     </div>
   );
 }
