@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, MessageSquare, Loader2, CheckCircle2 } from "lucide-react";
+import { X, MapPin, MessageSquare, Loader2, CheckCircle2, CalendarDays, Info } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,9 +17,22 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [address, setAddress] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const minDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 10);
+    return d.toISOString().split("T")[0];
+  }, []);
+  const maxDate = useMemo(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().split("T")[0];
+  }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,6 +45,10 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     }
     if (address.trim().length < 8) {
       toast.error("Ingresa una dirección válida");
+      return;
+    }
+    if (!deliveryDate || deliveryDate < minDate) {
+      toast.error("Los pedidos deben hacerse con al menos 10 días de anticipación");
       return;
     }
     setSubmitting(true);
@@ -55,6 +72,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     const { data: orderId, error } = await supabase.rpc("create_order", {
       _items: orderItems,
       _delivery_address: address.trim(),
+      _delivery_date: deliveryDate,
       _notes: notes.trim() || undefined,
     });
 
@@ -93,7 +111,8 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
       `📧 *Email:* ${user.email}\n\n` +
       `📦 *Productos:*\n${itemsText}\n\n` +
       `💰 *Total: $${totalSnapshot.toLocaleString("es-MX")} MXN*\n\n` +
-      `📍 *Dirección de entrega:*\n${address.trim()}` +
+      `📍 *Dirección de entrega:*\n${address.trim()}\n\n` +
+      `📅 *Fecha de entrega:* ${new Date(deliveryDate + "T00:00:00").toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}` +
       (notes.trim() ? `\n\n📝 *Notas:*\n${notes.trim()}` : "");
 
     const FLORERIA_WHATSAPP = "5216181169706"; // +52 618 116 9706
@@ -105,6 +124,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     setTimeout(() => {
       setSuccess(false);
       setAddress("");
+      setDeliveryDate("");
       setNotes("");
       onClose();
       setIsOpen(false);
@@ -186,6 +206,26 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
                       className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm transition resize-none"
                     />
                   </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-foreground flex items-center gap-2 mb-1.5">
+                      <CalendarDays className="h-4 w-4 text-primary" /> Fecha de entrega
+                    </label>
+                    <input
+                      type="date"
+                      value={deliveryDate}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
+                      min={minDate}
+                      max={maxDate}
+                      required
+                      className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm transition"
+                    />
+                    <p className="mt-1.5 text-xs text-muted-foreground flex items-start gap-1.5">
+                      <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-accent" />
+                      Los pedidos requieren al menos <strong className="text-foreground">10 días de anticipación</strong> para preparar tu arreglo con la mejor calidad.
+                    </p>
+                  </div>
+
 
                   <div>
                     <label className="text-sm font-medium text-foreground flex items-center gap-2 mb-1.5">
