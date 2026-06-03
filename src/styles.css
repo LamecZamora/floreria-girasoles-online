@@ -1,6 +1,5 @@
-/* @import rules MUST come before any other CSS at-rules or declarations.
-   Subset only the weights actually used: 600/700 display + 400/500/600/700 body. */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+/* Fonts are loaded via <link> in src/routes/__root.tsx (Lightning CSS can't
+   resolve remote @import URLs at build time). */
 @import "tailwindcss";
 @import "tw-animate-css";
 
