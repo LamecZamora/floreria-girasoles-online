@@ -240,6 +240,7 @@ export function useAllProductsAdmin() {
 
   useEffect(() => {
     let mounted = true;
+    startRealtime();
     const sub = (data: DbProduct[]) => { if (mounted) setProducts(data); };
     adminSubscribers.add(sub);
 
