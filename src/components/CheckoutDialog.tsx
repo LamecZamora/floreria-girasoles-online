@@ -55,6 +55,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     const { data: orderId, error } = await supabase.rpc("create_order", {
       _items: orderItems,
       _delivery_address: address.trim(),
+      _delivery_date: new Date().toISOString().slice(0, 10),
       _notes: notes.trim() || undefined,
     });
 
