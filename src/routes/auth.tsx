@@ -5,6 +5,8 @@ import { Eye, EyeOff, Mail, Lock, User, AlertTriangle, Flower2, ArrowLeft, Check
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
 import CaptchaChallenge, { type CaptchaHandle } from "@/components/CaptchaChallenge";
+import { lovable } from "@/integrations/lovable";
+
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
