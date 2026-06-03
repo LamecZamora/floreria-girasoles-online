@@ -168,6 +168,7 @@ export function useProducts() {
 
   useEffect(() => {
     let mounted = true;
+    startRealtime();
     const sub = (data: Product[]) => { if (mounted) setProducts(data); };
     publicSubscribers.add(sub);
 
