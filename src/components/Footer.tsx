@@ -65,6 +65,26 @@ const Footer = () => (
         </div>
       </div>
 
+      {/* Google Maps — Durango, México */}
+      <div className="mt-10 sm:mt-14">
+        <h4 className="font-heading text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-primary" />
+          ¿Dónde estamos?
+        </h4>
+        <div className="rounded-2xl overflow-hidden border border-primary-foreground/10 shadow-lg">
+          <iframe
+            title="Ubicación Florería Girasoles - Durango"
+            src="https://www.google.com/maps?q=Durango,%20Mexico&output=embed"
+            width="100%"
+            height="280"
+            style={{ border: 0 }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+          />
+        </div>
+      </div>
+
       <div className="border-t border-primary-foreground/10 mt-8 sm:mt-12 pt-6 text-center text-xs sm:text-sm text-primary-foreground/40 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
         <span className="flex items-center gap-1">
           Hecho con <Heart className="h-3.5 w-3.5 text-accent fill-accent inline" /> por Florería Girasoles
