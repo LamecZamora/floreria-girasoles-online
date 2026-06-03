@@ -70,6 +70,26 @@ function AuthPage() {
     resetCaptcha();
   }, [resetCaptcha]);
 
+  const signInWithGoogle = useCallback(async () => {
+    setError("");
+    setGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        setError(translateAuthError(result.error instanceof Error ? result.error.message : String(result.error)));
+      } else if (result.redirected) {
+        // Browser will redirect to Google — nothing more to do
+        return;
+      }
+    } catch (e) {
+      setError("Error al iniciar sesión con Google. Intenta de nuevo.");
+    } finally {
+      setGoogleLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (user) navigate({ to: "/" });
   }, [user, navigate]);
