@@ -209,6 +209,26 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
 
                   <div>
                     <label className="text-sm font-medium text-foreground flex items-center gap-2 mb-1.5">
+                      <CalendarDays className="h-4 w-4 text-primary" /> Fecha de entrega
+                    </label>
+                    <input
+                      type="date"
+                      value={deliveryDate}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
+                      min={minDate}
+                      max={maxDate}
+                      required
+                      className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm transition"
+                    />
+                    <p className="mt-1.5 text-xs text-muted-foreground flex items-start gap-1.5">
+                      <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-accent" />
+                      Los pedidos requieren al menos <strong className="text-foreground">10 días de anticipación</strong> para preparar tu arreglo con la mejor calidad.
+                    </p>
+                  </div>
+
+
+                  <div>
+                    <label className="text-sm font-medium text-foreground flex items-center gap-2 mb-1.5">
                       <MessageSquare className="h-4 w-4 text-primary" /> Notas (opcional)
                     </label>
                     <textarea
