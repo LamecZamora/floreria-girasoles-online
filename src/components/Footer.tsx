@@ -45,9 +45,9 @@ const Footer = () => (
         <div>
           <h4 className="font-heading text-base sm:text-lg font-semibold mb-3 sm:mb-4">Contacto</h4>
           <ul className="space-y-2.5 sm:space-y-3 text-sm text-primary-foreground/60">
-            <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-              Durango, México
+            <li className="flex items-start gap-2">
+              <MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+              <span>Belisario Domínguez 409, Barrio de Analco, 34138 Durango, Dgo.</span>
             </li>
             <li className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-primary flex-shrink-0" />
