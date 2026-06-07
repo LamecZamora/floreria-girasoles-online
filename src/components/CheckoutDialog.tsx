@@ -46,6 +46,10 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
       toast.error("Ingresa una dirección válida");
       return;
     }
+    if (!deliveryDate || deliveryDate < minDeliveryDate()) {
+      toast.error("La fecha de entrega debe ser al menos 10 días desde hoy");
+      return;
+    }
     setSubmitting(true);
 
     // Capture cart snapshot BEFORE clearing (for WhatsApp message)
