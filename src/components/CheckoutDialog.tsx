@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, MessageSquare, Loader2, CheckCircle2 } from "lucide-react";
+import { X, MapPin, MessageSquare, Loader2, CheckCircle2, Calendar } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
