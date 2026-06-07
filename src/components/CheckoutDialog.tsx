@@ -123,6 +123,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
       setSuccess(false);
       setAddress("");
       setNotes("");
+      setDeliveryDate(minDeliveryDate());
       onClose();
       setIsOpen(false);
       navigate({ to: "/pedidos" });
