@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, MessageSquare, Loader2, CheckCircle2 } from "lucide-react";
+import { X, MapPin, MessageSquare, Loader2, CheckCircle2, Calendar } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,12 +12,24 @@ interface Props {
   onClose: () => void;
 }
 
+const minDeliveryDate = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 10);
+  return d.toISOString().slice(0, 10);
+};
+const maxDeliveryDate = () => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().slice(0, 10);
+};
+
 const CheckoutDialog = ({ open, onClose }: Props) => {
   const { items, total, clearCart, setIsOpen } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState(minDeliveryDate());
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -32,6 +44,10 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     }
     if (address.trim().length < 8) {
       toast.error("Ingresa una dirección válida");
+      return;
+    }
+    if (!deliveryDate || deliveryDate < minDeliveryDate()) {
+      toast.error("La fecha de entrega debe ser al menos 10 días desde hoy");
       return;
     }
     setSubmitting(true);
@@ -55,7 +71,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
     const { data: orderId, error } = await supabase.rpc("create_order", {
       _items: orderItems,
       _delivery_address: address.trim(),
-      _delivery_date: new Date().toISOString().slice(0, 10),
+      _delivery_date: deliveryDate,
       _notes: notes.trim() || undefined,
     });
 
@@ -107,6 +123,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
       setSuccess(false);
       setAddress("");
       setNotes("");
+      setDeliveryDate(minDeliveryDate());
       onClose();
       setIsOpen(false);
       navigate({ to: "/pedidos" });
@@ -187,6 +204,23 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
                       className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm transition resize-none"
                     />
                   </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-foreground flex items-center gap-2 mb-1.5">
+                      <Calendar className="h-4 w-4 text-primary" /> Fecha de entrega
+                    </label>
+                    <input
+                      type="date"
+                      value={deliveryDate}
+                      min={minDeliveryDate()}
+                      max={maxDeliveryDate()}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm transition"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Mínimo 10 días desde hoy.</p>
+                  </div>
+
 
                   <div>
                     <label className="text-sm font-medium text-foreground flex items-center gap-2 mb-1.5">
