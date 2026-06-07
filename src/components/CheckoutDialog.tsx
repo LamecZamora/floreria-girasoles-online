@@ -226,7 +226,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
                       required
                       className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm transition"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">Mínimo 10 días desde hoy.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Mínimo 11 días desde hoy.</p>
                   </div>
 
 
