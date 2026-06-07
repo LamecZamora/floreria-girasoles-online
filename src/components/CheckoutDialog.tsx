@@ -12,15 +12,23 @@ interface Props {
   onClose: () => void;
 }
 
+// Format a Date as YYYY-MM-DD in LOCAL time (avoid UTC drift from toISOString)
+const fmtLocal = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
 const minDeliveryDate = () => {
   const d = new Date();
-  d.setDate(d.getDate() + 10);
-  return d.toISOString().slice(0, 10);
+  // +11 days to safely clear the server's "at least 10 days" check across timezones
+  d.setDate(d.getDate() + 11);
+  return fmtLocal(d);
 };
 const maxDeliveryDate = () => {
   const d = new Date();
   d.setFullYear(d.getFullYear() + 1);
-  return d.toISOString().slice(0, 10);
+  return fmtLocal(d);
 };
 
 const CheckoutDialog = ({ open, onClose }: Props) => {
@@ -218,7 +226,7 @@ const CheckoutDialog = ({ open, onClose }: Props) => {
                       required
                       className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm transition"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">Mínimo 10 días desde hoy.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Mínimo 11 días desde hoy.</p>
                   </div>
 
 
