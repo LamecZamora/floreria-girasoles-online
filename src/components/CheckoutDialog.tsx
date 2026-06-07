@@ -12,12 +12,24 @@ interface Props {
   onClose: () => void;
 }
 
+const minDeliveryDate = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 10);
+  return d.toISOString().slice(0, 10);
+};
+const maxDeliveryDate = () => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().slice(0, 10);
+};
+
 const CheckoutDialog = ({ open, onClose }: Props) => {
   const { items, total, clearCart, setIsOpen } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState(minDeliveryDate());
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
