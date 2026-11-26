@@ -1,0 +1,34 @@
+name: Deploy Floreria Web
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Copiar variables de entorno reales del servidor
+        run: cp /home/lamec/floreria-ci/.env .env || cp /home/lamec/floreria/web/floreria-girasoles-online-main/.env .env
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Compilar para producción
+        run: NITRO_PRESET=node-server npm run build
+
+      - name: Construir imagen Docker
+        run: docker build -t floreria-web:latest -f Dockerfile.ci .
+
+      - name: Importar imagen a Kubernetes
+        run: |
+          docker save floreria-web:latest -o /tmp/floreria-web-ci.tar
+          sudo k3s ctr images import /tmp/floreria-web-ci.tar
+
+      - name: Desplegar en Kubernetes
+        run: |
+          kubectl rollout restart deployment/floreria-web
+          kubectl rollout status deployment/floreria-web --timeout=120s
